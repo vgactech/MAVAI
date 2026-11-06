@@ -1,5 +1,5 @@
 /**
- * Mascot — floating companion hibou (Owly).
+ * Mascot — floating companion MAVAI.
  * Draggable orb with animated levitation and talking state.
  * Based on prototype V6 from KLERIO_BRONZE_BULLE_LIBRE.html
  * DEBUG MODE ACTIVE
@@ -38,7 +38,7 @@ const POSE_POSITIONS: Record<MascotPose, string> = {
 export function Mascot({
   talking = false,
   pose = "classic",
-  statusLabel = "Owly — compagnon hibou",
+  statusLabel = "MAVAI — assistant IA",
   className = "",
 }: MascotProps) {
   const orbRef = useRef<HTMLButtonElement>(null);
@@ -101,7 +101,7 @@ export function Mascot({
   return (
     <div
       style={{ position: "fixed", top: pos.y, left: pos.x, zIndex: 40, width: 96 }}
-      aria-label="Owly — compagnon hibou"
+      aria-label="MAVAI — assistant IA"
     >
       <button
         ref={orbRef}
@@ -227,7 +227,7 @@ export function MascotAvatar({
   return (
     <span
       role="img"
-      aria-label="Owly — hibou mascotte"
+      aria-label="MAVAI — mascotte IA"
       style={{
         display: "inline-block",
         width: size,

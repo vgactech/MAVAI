@@ -1,5 +1,5 @@
 /**
- * play.tsx — Sélecteur de classe Owly (page /play)
+ * play.tsx — Sélecteur de classe MAVAI (page /play)
  * Cartes personnages hibou pixel art RPG avec effet 3D CSS.
  * Image source : public/owly-pixel-art.png — grille 4×2 (1536×1024px)
  * Chaque cellule : 384×512px
@@ -12,8 +12,8 @@ import { useState } from "react";
 export const Route = createFileRoute("/_authenticated/play")({
   head: () => ({
     meta: [
-      { title: "Choisis ta classe — Owly" },
-      { name: "description", content: "Choisis ton archétype de héros dans Owly." },
+      { title: "Choisis ta classe — MAVAI" },
+      { name: "description", content: "Choisis ton archétype de héros dans MAVAI." },
     ],
   }),
   component: PlayPage,

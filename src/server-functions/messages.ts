@@ -1,12 +1,14 @@
 /**
  * Server Function: /api/messages
- * Handles chat message submission: calls OpenAI (text/vision) and optionally
- * ElevenLabs (TTS) for voice mode. Secrets are server-side only — never
- * exposed to client code.
+ * Handles chat message submission: dual-path — ARTcB backend (primary) or
+ * OpenAI (fallback). ElevenLabs (TTS) for voice mode.
+ * Secrets are server-side only — never exposed to client code.
  *
- * Export pattern: plain async handler, compatible with TanStack Start's
- * createServerFn when available. Currently called via fetch('/api/messages').
- * DEBUG MODE ACTIVE
+ * Dual-path routing:
+ *   1. If ARTCB_API_URL is set → POST /api/v1/ai/think on artcb.me
+ *   2. Fallback → OpenAI gpt-4o-mini / gpt-4o (vision)
+ *
+ * CERTIFIED_100=false | unique_human_proven=false | Mode DEBUG actif
  */
 
 import { z } from "zod";
@@ -52,6 +54,45 @@ function readSecret(name: string): string {
   return val;
 }
 
+/**
+ * callARTcB — sends a message to the ARTcB backend (artcb.me /api/v1/ai/think).
+ * Returns the AI reply or throws if the endpoint is unavailable.
+ * ARTCB_API_URL must be set (e.g. https://artcb.me) — never hardcoded.
+ * ARTCB_API_KEY is optional (Bearer token for authenticated requests).
+ */
+async function callARTcB(text: string, sessionId: string, userId: string): Promise<string> {
+  const baseUrl = process.env["ARTCB_API_URL"];
+  if (!baseUrl) throw new Error("ARTCB_API_URL not set");
+
+  const apiKey = process.env["ARTCB_API_KEY"];
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (apiKey) headers["Authorization"] = `Bearer ${apiKey}`;
+
+  const res = await fetch(`${baseUrl}/api/v1/ai/think`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      text,
+      agent: `mavai-user-${userId.slice(0, 8)}`,
+      session_id: sessionId,
+      inject_context: true,
+      visibility: "private",
+    }),
+    signal: AbortSignal.timeout(15_000),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    console.error("[DEBUG][messages] ARTcB error:", res.status, err.slice(0, 200));
+    throw new Error(`ARTcB ${res.status}`);
+  }
+
+  const json = (await res.json()) as { reply?: string; content?: string; text?: string };
+  const reply = json.reply ?? json.content ?? json.text;
+  if (!reply) throw new Error("ARTcB: empty reply");
+  return reply;
+}
+
 type ImageInput = { data: string; type: string };
 
 type ContentPart =
@@ -87,7 +128,8 @@ async function callOpenAI(text: string, images: ImageInput[]): Promise<string> {
         {
           role: "system",
           content:
-            "Tu es Owly, un assistant personnel organisé, bienveillant et professionnel. " +
+            "Tu es MAVAI (Mémoire Artificielle Visuelle & IA), un assistant IA avancé. " +
+            "Tu es organisé, bienveillant et professionnel. " +
             "Réponds en français sauf si l'utilisateur écrit dans une autre langue. " +
             "Pour les résultats OCR, indique toujours « À vérifier » si le contenu est incertain.",
         },
@@ -176,10 +218,28 @@ export async function sendMessageHandler(raw: unknown): Promise<MessageResponse>
       ? "Les documents joints ont été transmis. Le contenu extrait est « À vérifier »."
       : undefined;
 
-  const reply = await callOpenAI(
-    text,
-    imageFiles.map((f) => ({ data: f.dataBase64, type: f.type })),
-  );
+  // ── Dual-path routing ──────────────────────────────────────────────────────
+  // Path A: ARTcB backend (artcb.me) — primary if ARTCB_API_URL is set.
+  //         Images not forwarded to ARTcB (text-only endpoint).
+  // Path B: OpenAI — fallback, or always used when images are attached.
+  let reply: string;
+  const artcbUrl = process.env["ARTCB_API_URL"];
+  const useARTcB = !!artcbUrl && imageFiles.length === 0;
+
+  if (useARTcB) {
+    try {
+      reply = await callARTcB(text, sessionId, userId);
+      console.debug("[DEBUG][messages] ARTcB reply received", { replyLength: reply.length });
+    } catch (artcbErr) {
+      console.warn("[DEBUG][messages] ARTcB failed, falling back to OpenAI:", artcbErr);
+      reply = await callOpenAI(text, []);
+    }
+  } else {
+    reply = await callOpenAI(
+      text,
+      imageFiles.map((f) => ({ data: f.dataBase64, type: f.type })),
+    );
+  }
 
   let audioUrl: string | undefined;
   if (mode === "voice") {

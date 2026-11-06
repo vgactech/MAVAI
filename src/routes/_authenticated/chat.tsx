@@ -19,8 +19,8 @@ import type { ChatMessage, ChatMode } from "@/types/mavai";
 export const Route = (createFileRoute as any)("/_authenticated/chat")({
   head: () => ({
     meta: [
-      { title: "Chat — Owly" },
-      { name: "description", content: "Votre assistant personnel Owly." },
+      { title: "Chat — MAVAI" },
+      { name: "description", content: "Votre assistant personnel MAVAI." },
     ],
   }),
   component: ChatRoute,

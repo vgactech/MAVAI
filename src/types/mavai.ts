@@ -1,6 +1,6 @@
 /**
  * MAVAI — core domain types
- * Fork de klerio/Owly — adapté pour MAVAI (Mémoire Artificielle Visuelle & IA)
+ * Fork de klerio — adapté pour MAVAI (Mémoire Artificielle Visuelle & IA)
  * Frontend: vgactech/MAVAI (ce dépôt)
  * Backend: vgactech/MAVAI (Python FastAPI + ARTcB blockchain)
  * DEBUG MODE ACTIVE

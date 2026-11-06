@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "Mon espace — Owly" },
-      { name: "description", content: "Ton espace personnel Owly." },
-      { property: "og:title", content: "Mon espace — Owly" },
-      { property: "og:description", content: "Ton espace personnel Owly." },
+      { title: "Mon espace — MAVAI" },
+      { name: "description", content: "Ton espace personnel MAVAI." },
+      { property: "og:title", content: "Mon espace — MAVAI" },
+      { property: "og:description", content: "Ton espace personnel MAVAI." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -31,14 +31,14 @@ function Dashboard() {
 
   return (
     <main className="mx-auto max-w-2xl space-y-6 px-4 py-16">
-      <h1 className="text-3xl font-semibold text-foreground">Bienvenue sur Owly</h1>
+      <h1 className="text-3xl font-semibold text-foreground">Bienvenue sur MAVAI</h1>
       <p className="text-muted-foreground">
         Connecté en tant que{" "}
         <span className="font-medium">{user.email ?? user.name ?? user.id}</span>
       </p>
       <div className="flex gap-3">
         <Button asChild>
-          {/* /play — sélecteur de classe Owly */}
+          {/* /play — sélecteur de classe MAVAI */}
           <Link to={"/play" as "/"}>Choisir ma classe</Link>
         </Button>
         <Button asChild variant="secondary">
