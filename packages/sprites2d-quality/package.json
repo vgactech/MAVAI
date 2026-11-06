@@ -1,0 +1,19 @@
+{
+  "name": "@sprites2d/quality",
+  "version": "0.1.0",
+  "description": "SPRITES 2D — Asset quality validation engine",
+  "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@sprites2d/schema": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}

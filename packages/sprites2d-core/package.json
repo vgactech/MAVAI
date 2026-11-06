@@ -1,0 +1,21 @@
+{
+  "name": "@sprites2d/core",
+  "version": "0.1.0",
+  "description": "Deterministic assembly engine for SPRITES 2D — no AI, no network required",
+  "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@sprites2d/schema": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "vitest": "^4.1.10"
+  }
+}

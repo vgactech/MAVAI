@@ -1,0 +1,20 @@
+{
+  "name": "@sprites2d/character",
+  "version": "0.1.0",
+  "description": "SPRITES 2D — Character DNA manager and OWLY presets",
+  "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@sprites2d/core": "workspace:*",
+    "@sprites2d/schema": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}

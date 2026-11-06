@@ -1,0 +1,165 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design system definition — Klerio Bronze Theme
+ *
+ * Palette:
+ *   --background   #6B4427  dark walnut brown
+ *   --card         #59371F  deeper brown
+ *   --foreground   #FFF3DF  warm ivory
+ *   --accent       #CD7F32  bronze gold
+ *   --muted        #E0C6AA  sand muted
+ *
+ * All colors use oklch format as required by Tailwind v4.
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/* ─── Bronze theme — unique (no dark variant needed, theme is always dark-warm) ─── */
+:root {
+  --radius: 0.75rem;
+
+  /* #6B4427 — walnut bg */
+  --background: oklch(0.38 0.075 49);
+  /* #FFF3DF — ivory ink */
+  --foreground: oklch(0.97 0.028 80);
+
+  /* #59371F — deeper card */
+  --card: oklch(0.32 0.075 49);
+  --card-foreground: oklch(0.97 0.028 80);
+
+  --popover: oklch(0.32 0.075 49);
+  --popover-foreground: oklch(0.97 0.028 80);
+
+  /* #CD7F32 — bronze accent as primary */
+  --primary: oklch(0.65 0.12 58);
+  --primary-foreground: oklch(0.18 0.04 49);
+
+  /* slightly lighter brown for secondary surfaces */
+  --secondary: oklch(0.44 0.075 49);
+  --secondary-foreground: oklch(0.97 0.028 80);
+
+  /* #E0C6AA — sandy muted */
+  --muted: oklch(0.44 0.04 60);
+  --muted-foreground: oklch(0.83 0.045 68);
+
+  /* #CD7F32 — bronze accent */
+  --accent: oklch(0.65 0.12 58);
+  --accent-foreground: oklch(0.18 0.04 49);
+
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.97 0.028 80);
+
+  /* subtle warm border */
+  --border: oklch(1 0 0 / 15%);
+  --input: oklch(1 0 0 / 20%);
+  --ring: oklch(0.65 0.12 58);
+
+  --chart-1: oklch(0.65 0.12 58);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+
+  --sidebar: oklch(0.32 0.075 49);
+  --sidebar-foreground: oklch(0.97 0.028 80);
+  --sidebar-primary: oklch(0.65 0.12 58);
+  --sidebar-primary-foreground: oklch(0.18 0.04 49);
+  --sidebar-accent: oklch(0.44 0.075 49);
+  --sidebar-accent-foreground: oklch(0.97 0.028 80);
+  --sidebar-border: oklch(1 0 0 / 15%);
+  --sidebar-ring: oklch(0.65 0.12 58);
+}
+
+/* Keep .dark identical — design is intentionally always warm/dark */
+.dark {
+  --radius: 0.75rem;
+  --background: oklch(0.38 0.075 49);
+  --foreground: oklch(0.97 0.028 80);
+  --card: oklch(0.32 0.075 49);
+  --card-foreground: oklch(0.97 0.028 80);
+  --popover: oklch(0.32 0.075 49);
+  --popover-foreground: oklch(0.97 0.028 80);
+  --primary: oklch(0.65 0.12 58);
+  --primary-foreground: oklch(0.18 0.04 49);
+  --secondary: oklch(0.44 0.075 49);
+  --secondary-foreground: oklch(0.97 0.028 80);
+  --muted: oklch(0.44 0.04 60);
+  --muted-foreground: oklch(0.83 0.045 68);
+  --accent: oklch(0.65 0.12 58);
+  --accent-foreground: oklch(0.18 0.04 49);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.97 0.028 80);
+  --border: oklch(1 0 0 / 15%);
+  --input: oklch(1 0 0 / 20%);
+  --ring: oklch(0.65 0.12 58);
+  --chart-1: oklch(0.65 0.12 58);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.445);
+  --sidebar: oklch(0.32 0.075 49);
+  --sidebar-foreground: oklch(0.97 0.028 80);
+  --sidebar-primary: oklch(0.65 0.12 58);
+  --sidebar-primary-foreground: oklch(0.18 0.04 49);
+  --sidebar-accent: oklch(0.44 0.075 49);
+  --sidebar-accent-foreground: oklch(0.97 0.028 80);
+  --sidebar-border: oklch(1 0 0 / 15%);
+  --sidebar-ring: oklch(0.65 0.12 58);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
+}

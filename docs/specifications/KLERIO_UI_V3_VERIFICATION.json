@@ -1,0 +1,9 @@
+{
+  "version": "V3",
+  "syntax": "passed",
+  "scenario_checks": 36,
+  "gesture_checks": 8,
+  "methods": "Exécution des fonctions avec rendu et géométrie simulés",
+  "browser_validation": "not performed: browser unavailable and download failed",
+  "external_services": "not connected"
+}

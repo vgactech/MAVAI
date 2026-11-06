@@ -1,0 +1,16 @@
+{
+  "name": "@sprites2d/schema",
+  "version": "0.1.0",
+  "description": "Shared TypeScript types for SPRITES 2D — CharacterDNA, Species, Equipment, Animation",
+  "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}

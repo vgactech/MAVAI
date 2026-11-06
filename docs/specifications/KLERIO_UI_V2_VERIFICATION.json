@@ -1,0 +1,15 @@
+{
+  "status": "passed",
+  "checks": 8,
+  "scope": "Unit tests of actual pointer handlers with mocked layout; not browser or touch-device validation",
+  "cases": [
+    "full send once",
+    "short drag retains draft",
+    "wrong direction no send",
+    "pointercancel no send",
+    "duplicate pointerup no resend",
+    "mode follows left",
+    "mode follows right",
+    "cancel resets mode"
+  ]
+}
