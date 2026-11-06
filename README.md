@@ -1,5 +1,5 @@
 # MAVAI — Frontend
-
+**MASTER Audio Visuelle IA** 
 **Mémoire Artificielle Visuelle & IA** — Frontend React/TypeScript
 
 > Fork de [klerio-project-hub](https://github.com/vgactech/klerio-project-hub) — réutilisation du chat IA, Sprites2D et fonctionnalités UI.
