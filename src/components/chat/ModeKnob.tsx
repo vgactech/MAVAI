@@ -1,7 +1,7 @@
 /**
  * ModeKnob — draggable 3-position mode selector.
  * Positions: vocal (left) | text (centre) | documents (right)
- * Based on prototype V6 from KLERIO_BRONZE_BULLE_LIBRE.html
+ * Based on prototype V6 from MAVAI_BRONZE_BULLE_LIBRE.html
  * DEBUG MODE ACTIVE
  */
 

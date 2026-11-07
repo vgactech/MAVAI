@@ -1,7 +1,7 @@
 /**
  * ChatComposer — text + file input bar at the bottom of /chat.
  * Integrates ModeKnob (left) + SendKnob (right) + textarea (center).
- * Based on prototype V6 from KLERIO_BRONZE_BULLE_LIBRE.html
+ * Based on prototype V6 from MAVAI_BRONZE_BULLE_LIBRE.html
  * DEBUG MODE ACTIVE
  */
 

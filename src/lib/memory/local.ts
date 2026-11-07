@@ -7,8 +7,8 @@
 import type { ChatMessage, KlerioChatSession, ChatMode } from "@/types/klerio";
 import type { MemoryRepository } from "./repository";
 
-const PREFIX = "klerio:session:";
-const INDEX_KEY = "klerio:sessions:index";
+const PREFIX = "mavai:session:";
+const INDEX_KEY = "mavai:sessions:index";
 
 function sessionKey(sessionId: string): string {
   return `${PREFIX}${sessionId}`;

@@ -1,7 +1,7 @@
 /**
  * SendKnob — hold + slide-left gesture button to send a message.
  * Swipe ≥ 80 px left triggers send. Click also triggers send.
- * Based on prototype V6 from KLERIO_BRONZE_BULLE_LIBRE.html
+ * Based on prototype V6 from MAVAI_BRONZE_BULLE_LIBRE.html
  * DEBUG MODE ACTIVE
  */
 

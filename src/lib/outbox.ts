@@ -6,7 +6,7 @@
 
 import type { ChatMessage, OutboxEntry, OutboxStatus } from "@/types/klerio";
 
-const OUTBOX_KEY = "klerio:outbox";
+const OUTBOX_KEY = "mavai:outbox";
 
 function readEntries(): OutboxEntry[] {
   if (typeof localStorage === "undefined") return [];

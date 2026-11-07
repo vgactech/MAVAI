@@ -1,7 +1,7 @@
 /**
  * Mascot — floating companion MAVAI.
  * Draggable orb with animated levitation and talking state.
- * Based on prototype V6 from KLERIO_BRONZE_BULLE_LIBRE.html
+ * Based on prototype V6 from MAVAI_BRONZE_BULLE_LIBRE.html
  * DEBUG MODE ACTIVE
  */
 

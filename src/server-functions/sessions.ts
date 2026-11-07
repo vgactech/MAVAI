@@ -49,7 +49,7 @@ export async function createSessionHandler(raw: unknown): Promise<SessionRespons
   }
 
   const workspaceId = `ws_${userId.slice(0, 12)}`;
-  const sessionId = `klerio_sess_${Date.now().toString(36)}`;
+  const sessionId = `mavai_sess_${Date.now().toString(36)}`;
   const createdAt = new Date().toISOString();
 
   console.debug("[DEBUG][sessions] Session created for user:", userId, "workspace:", workspaceId);

@@ -29,7 +29,7 @@ export interface ChatMessage {
 
 // ─── Session ─────────────────────────────────────────────────────────────────
 
-export interface KlerioChatSession {
+export interface MAVAIChatSession {
   sessionId: string;
   userId: string;
   workspaceId: string;
@@ -39,11 +39,14 @@ export interface KlerioChatSession {
   updatedAt: string;
 }
 
+/** @deprecated Use MAVAIChatSession */
+export type KlerioChatSession = MAVAIChatSession;
+
 // ─── Memory / documents ──────────────────────────────────────────────────────
 
 export type DocumentStatus = "pending" | "processing" | "ready" | "error";
 
-export interface KlerioDocument {
+export interface MAVAIDocument {
   docId: string;
   fileName: string;
   mimeType: string;
@@ -56,15 +59,21 @@ export interface KlerioDocument {
   uploadedAt: string;
 }
 
+/** @deprecated Use MAVAIDocument */
+export type KlerioDocument = MAVAIDocument;
+
 // ─── Workspace (GitHub-as-DB identity) ───────────────────────────────────────
 
-export interface KlerioWorkspace {
-  /** Stable ID — used as GitHub repo suffix `klerio-memory-<workspaceId>` */
+export interface MAVAIWorkspace {
+  /** Stable ID — used as GitHub repo suffix `mavai-memory-<workspaceId>` */
   workspaceId: string;
   ownerId: string;
   githubRepo?: string;
   createdAt: string;
 }
+
+/** @deprecated Use MAVAIWorkspace */
+export type KlerioWorkspace = MAVAIWorkspace;
 
 // ─── Outbox (durable message queue) ──────────────────────────────────────────
 
@@ -85,5 +94,5 @@ export const MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024; // 20 MB hard limit
 export const MAX_FILES_PER_SEND = 10;
 
 export type FileUploadResult =
-  | { ok: true; document: KlerioDocument }
+  | { ok: true; document: MAVAIDocument }
   | { ok: false; error: "TOO_LARGE" | "TOO_MANY" | "UNSUPPORTED_TYPE" | "UNKNOWN" };
