@@ -68,17 +68,20 @@ async function callARTcB(text: string, sessionId: string, userId: string): Promi
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (apiKey) headers["Authorization"] = `Bearer ${apiKey}`;
 
+  // ARTcB /api/v1/ai/think expects "question" (not "text") — ThinkRequest schema.
+  // Response fields: message (always), reply / content / text (legacy).
   const res = await fetch(`${baseUrl}/api/v1/ai/think`, {
     method: "POST",
     headers,
     body: JSON.stringify({
-      text,
+      question: text,
       agent: `mavai-user-${userId.slice(0, 8)}`,
       session_id: sessionId,
       inject_context: true,
       visibility: "private",
+      store_block: true,
     }),
-    signal: AbortSignal.timeout(15_000),
+    signal: AbortSignal.timeout(20_000),
   });
 
   if (!res.ok) {
@@ -87,8 +90,14 @@ async function callARTcB(text: string, sessionId: string, userId: string): Promi
     throw new Error(`ARTcB ${res.status}`);
   }
 
-  const json = (await res.json()) as { reply?: string; content?: string; text?: string };
-  const reply = json.reply ?? json.content ?? json.text;
+  const json = (await res.json()) as {
+    message?: string;
+    reply?: string;
+    content?: string;
+    text?: string;
+  };
+  // "message" is the primary field returned by /ai/think on artcb.me
+  const reply = json.message ?? json.reply ?? json.content ?? json.text;
   if (!reply) throw new Error("ARTcB: empty reply");
   return reply;
 }
