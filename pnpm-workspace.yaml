@@ -1,0 +1,7 @@
+packages:
+  - packages/*
+permissions:
+  '@tanstack/react-start':
+    skills: true
+  '@tanstack/router-plugin':
+    skills: true
