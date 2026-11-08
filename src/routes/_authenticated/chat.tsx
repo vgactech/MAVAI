@@ -1,7 +1,7 @@
 /**
  * /chat route — protected main interface of MAVAI.
  * Displays ChatFeed + ChatComposer + Mascot.
- * Sends messages via the /api/messages server function (MAVAI backend or ARTcB relay).
+ * Sends messages via sendMessageFn (TanStack Start createServerFn — ARTcB or OpenAI).
  * DEBUG MODE ACTIVE
  * CERTIFIED_100=false | unique_human_proven=false
  */
@@ -13,6 +13,7 @@ import { ChatComposer, type ComposerSubmitPayload } from "@/components/chat/Chat
 import { Mascot } from "@/components/chat/Mascot";
 import { outbox } from "@/lib/outbox";
 import type { ChatMessage, ChatMode } from "@/types/mavai";
+import { sendMessageFn } from "@/server-functions/send-message";
 
 // Route registered after routeTree is generated — no-op type cast until regen
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -65,26 +66,27 @@ function ChatRoute() {
       setMascotTalking(true);
 
       try {
-        // 4. Prepare form data for file uploads
-        const formData = new FormData();
-        formData.append("text", payload.text);
-        formData.append("mode", payload.mode);
-        formData.append("sessionId", sessionId);
-        formData.append("userId", user.id);
-        formData.append("userMessageId", userMsg.id);
-        payload.files.forEach((f) => formData.append("files", f));
-
-        // 5. POST to server function
-        const res = await fetch("/api/messages", {
-          method: "POST",
-          body: formData,
-        });
-
-        if (!res.ok) {
-          throw new Error(`Erreur serveur ${res.status}: ${await res.text()}`);
+        // 4. Prepare file list for sendMessageFn (base64 encoded)
+        const files: Array<{ name: string; type: string; dataBase64: string; sizeBytes: number }> = [];
+        for (const f of payload.files) {
+          if (f instanceof File && f.size > 0) {
+            const buf = await f.arrayBuffer();
+            const base64 = btoa(String.fromCharCode(...new Uint8Array(buf)));
+            files.push({ name: f.name, type: f.type || "application/octet-stream", dataBase64: base64, sizeBytes: f.size });
+          }
         }
 
-        const data = (await res.json()) as { reply: string; audioUrl?: string };
+        // 5. Call TanStack Start server function (replaces fetch("/api/messages"))
+        const data = await sendMessageFn({
+          data: {
+            text: payload.text,
+            mode: payload.mode,
+            sessionId,
+            userId: user.id,
+            userMessageId: userMsg.id,
+            files,
+          },
+        });
 
         // 6. Build assistant message
         const assistantMsg: ChatMessage = {
