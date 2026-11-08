@@ -30,3 +30,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Secrets — jamais versionner
+.env
+.env.local
+.env.production
+.env.*.local
