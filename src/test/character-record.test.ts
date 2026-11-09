@@ -1,0 +1,3 @@
+import { describe, it, expect } from "vitest";
+import { characterSchema, characterPrompt } from "../lib/character-record";
+describe("character references",()=>{it("retains artistic continuity constraints",()=>{const c=characterSchema.parse({name:"Alice",appearance:"Yeux verts",costume:"Veste rouge",palette:"Rouge",rules:"La tasse reste dans la main gauche",reference:""});expect(characterPrompt(c)).toContain("La tasse reste dans la main gauche");});it("rejects executable reference URLs",()=>{expect(characterSchema.safeParse({name:"Alice",appearance:"",costume:"",palette:"",rules:"",reference:"javascript:alert(1)"}).success).toBe(false);});});

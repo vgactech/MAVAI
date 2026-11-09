@@ -1,0 +1,11 @@
+ALTER TABLE public.works ADD COLUMN IF NOT EXISTS project_id uuid REFERENCES public.production_projects(id) ON DELETE CASCADE;
+ALTER TABLE public.conversations ADD COLUMN IF NOT EXISTS project_id uuid REFERENCES public.production_projects(id) ON DELETE CASCADE;
+ALTER TABLE public.memories ADD COLUMN IF NOT EXISTS project_id uuid REFERENCES public.production_projects(id) ON DELETE CASCADE;
+CREATE INDEX IF NOT EXISTS works_project_idx ON public.works(project_id,user_id);
+CREATE INDEX IF NOT EXISTS conversations_project_idx ON public.conversations(project_id,user_id);
+CREATE INDEX IF NOT EXISTS memories_project_idx ON public.memories(project_id,user_id);
+CREATE OR REPLACE FUNCTION public.validate_project_owner() RETURNS trigger LANGUAGE plpgsql SET search_path=public AS $$ BEGIN IF NEW.project_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM public.production_projects p WHERE p.id=NEW.project_id AND p.user_id=NEW.user_id) THEN RAISE EXCEPTION 'Project does not belong to owner' USING ERRCODE='42501'; END IF; RETURN NEW; END; $$;
+CREATE TRIGGER works_project_owner BEFORE INSERT OR UPDATE ON public.works FOR EACH ROW EXECUTE FUNCTION public.validate_project_owner();
+CREATE TRIGGER conversations_project_owner BEFORE INSERT OR UPDATE ON public.conversations FOR EACH ROW EXECUTE FUNCTION public.validate_project_owner();
+CREATE TRIGGER memories_project_owner BEFORE INSERT OR UPDATE ON public.memories FOR EACH ROW EXECUTE FUNCTION public.validate_project_owner();
+CREATE TRIGGER production_items_project_owner BEFORE INSERT OR UPDATE ON public.production_items FOR EACH ROW EXECUTE FUNCTION public.validate_project_owner();

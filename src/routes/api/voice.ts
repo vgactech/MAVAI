@@ -1,0 +1,2 @@
+import { createFileRoute } from '@tanstack/react-router';
+export const Route = createFileRoute('/api/voice')({server:{handlers:{POST:async ({request})=>{const {handleVoice}=await import('@/lib/voice-http.server');return handleVoice(request);}}}});

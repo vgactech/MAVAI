@@ -1,81 +1,29 @@
-# MAVAI — Frontend
-**MASTER Audio Visuelle IA** 
+# Welcome to your Lovable project
 
-**Mémoire Artificielle Visuelle & IA** — Frontend React/TypeScript
+This project was built with [Lovable](https://lovable.dev).
 
-> Fork de [klerio-project-hub](https://github.com/vgactech/klerio-project-hub) — réutilisation du chat IA, Sprites2D et fonctionnalités UI.
+## Build with Lovable
 
----
+Open your project in the [Lovable editor](https://lovable.dev) and keep building.
 
-## Architecture
+- **Ship faster**: describe what you want to build and Lovable handles the code.
+- **Stay in sync**: connect the project to GitHub and every change made in Lovable is committed straight to your repository.
+- **Full ownership**: this code is yours. Push to your repository and your changes sync back into Lovable, ready for your next prompt.
 
-```
-vgactech/MAVAI  (ce dépôt)         ← FRONTEND
-  React + TanStack Start
-  Chat IA multi-modal
-  Sprites2D (animation / QA frame)
-  Connexion backend MAVAI via /api/*
+## Development
 
-vgactech/MAVAI  (branche backend)  ← BACKEND (même dépôt, dossier backend/)
-  Python FastAPI
-  src/mavai/ (coordinator, agents, continuity, memory)
-  Connecté à ARTcB blockchain (nœuds OVH2 + OVH4)
-```
+Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
 
-## Dépôts liés
-
-| Dépôt | Rôle |
-|-------|------|
-| `vgactech/MAVAI` | Frontend MAVAI (ce dépôt) |
-| `vgactech/artcb` | Blockchain ARTcB — infrastructure hôte |
-| `vgactech/klerio-project-hub` | Source originale (fork) |
-
-## Stack technique
-
-- **React** + **TanStack Router** + **Vite** (Rolldown)
-- **Sprites2D** — packages animation/QA/schema/SDK
-- **Lovable Auth** — authentification
-- **ARTcB Backend** — hébergement, mémoire blockchain, PoL
-
-## Installation
-
-```bash
-npm install
-npm run dev       # dev server
-npm run build     # production build
-npm run test      # tests vitest
+```sh
+git clone <this-repository-url>
+cd <repository-name>
+npm i
+npm run dev
 ```
 
-## Variables d'environnement
+## Built with
 
-```bash
-VITE_MAVAI_BACKEND_URL=http://localhost:8000   # URL du backend MAVAI
-VITE_ARTCB_NODE_URL=https://artcb.me           # Nœud ARTcB live
-```
-
-## Structure
-
-```
-src/
-  routes/           # Pages TanStack Router
-    index.tsx       # Page d'accueil MAVAI
-    _authenticated/
-      chat.tsx      # Interface chat MAVAI (fork klerio)
-      dashboard.tsx
-      play.tsx      # Sprites2D / jeu
-  components/
-    chat/           # ChatFeed, ChatComposer, Mascot
-    ui/             # Composants shadcn/ui
-  types/
-    mavai.ts        # Types domaine MAVAI (fork klerio.ts)
-packages/
-  sprites2d-core/   # Moteur animation 2D
-  sprites2d-character/
-  sprites2d-quality/ # QA frame par frame
-  sprites2d-schema/
-  sprites2d-sdk/
-```
-
-## CERTIFIED_100=false | unique_human_proven=false | Mode DEBUG actif
-
-*ARTcB blockchain — infrastructure décentralisée MAVAI*
+- TanStack Start
+- TypeScript
+- React
+- Tailwind CSS

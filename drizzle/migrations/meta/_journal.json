@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1794063585670,
+      "tag": "0000_mavai_modules",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794089084573,
+      "tag": "0001_mavai_production_foundations",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794097757378,
+      "tag": "0002_project_scope_modules",
+      "breakpoints": true
+    }
+  ]
+}

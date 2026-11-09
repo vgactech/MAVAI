@@ -2,7 +2,13 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, type FormEvent } from "react";
 import { toast } from "sonner";
 import { lovable } from "@/integrations/lovable";
+import { getCurrentUser } from "@/lib/auth-session";
 import { Button } from "@/components/ui/button";
+import { MavaiMark } from "@/components/MavaiMark";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { SentinelVideo } from "@/components/SentinelVideo";
+import sentinelAsset from "@/assets/videos/binance-sentinel-mavai.mp4.asset.json";
+import sentinelPoster from "@/assets/videos/binance-sentinel-mavai-poster.png.asset.json";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -23,10 +29,9 @@ function AuthPage() {
 
   // If already logged in, redirect straight to chat
   useEffect(() => {
-    const session = lovable.auth.getSession();
-    if (session) {
-      navigate({ to: "/dashboard", replace: true });
-    }
+    void getCurrentUser().then((u) => {
+      if (u) navigate({ to: "/dashboard", replace: true });
+    });
   }, [navigate]);
 
   async function social(provider: "google" | "lovable") {
@@ -35,7 +40,7 @@ function AuthPage() {
     });
     if (res && "error" in res && res.error) {
       toast.error(String((res.error as { message?: string }).message ?? res.error));
-    } else {
+    } else if (!("redirected" in res && res.redirected)) {
       // After OAuth redirect, session is stored → go to dashboard
       navigate({ to: "/dashboard", replace: true });
     }
@@ -53,8 +58,18 @@ function AuthPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="w-full max-w-sm space-y-6 rounded-xl border border-border bg-card p-6">
+    <main className="min-h-dvh bg-background text-foreground">
+      <header className="border-b border-border">
+        <div className="mx-auto flex max-w-5xl items-center gap-3 px-4 py-4 sm:px-6">
+          <MavaiMark className="size-8" />
+          <span className="font-display font-semibold">MAVAI</span>
+          <div className="flex-1" />
+          <ThemeToggle />
+        </div>
+      </header>
+      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
+        <SentinelVideo videoUrl={sentinelAsset.url} posterUrl={sentinelPoster.url} />
+      <div className="mx-auto mt-10 w-full max-w-sm space-y-6 rounded-lg border border-border bg-card p-6">
         <h1 className="text-2xl font-semibold text-card-foreground">MAVAI</h1>
 
         <div className="space-y-2">
@@ -78,6 +93,7 @@ function AuthPage() {
             Envoyer un lien magique
           </Button>
         </form>
+      </div>
       </div>
     </main>
   );

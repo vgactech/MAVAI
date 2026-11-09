@@ -12,9 +12,21 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedAgentsRouteImport } from './routes/_authenticated/agents'
+import { Route as AuthenticatedAudioStudioRouteImport } from './routes/_authenticated/audio-studio'
+import { Route as AuthenticatedCharacterStudioRouteImport } from './routes/_authenticated/character-studio'
 import { Route as AuthenticatedChatRouteImport } from './routes/_authenticated/chat'
+import { Route as AuthenticatedContinuityRouteImport } from './routes/_authenticated/continuity'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedPlayRouteImport } from './routes/_authenticated/play'
+import { Route as AuthenticatedFrameControlRouteImport } from './routes/_authenticated/frame-control'
+import { Route as AuthenticatedMemoireRouteImport } from './routes/_authenticated/memoire'
+import { Route as AuthenticatedProjectsRouteImport } from './routes/_authenticated/projects'
+import { Route as AuthenticatedSignalDeskRouteImport } from './routes/_authenticated/signal-desk'
+import { Route as AuthenticatedStudioRouteImport } from './routes/_authenticated/studio'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as ApiVoiceRouteImport } from './routes/api/voice'
+import { Route as AuthenticatedChatThreadIdRouteImport } from './routes/_authenticated/chat_.$threadId'
+import { Route as AuthenticatedProjectsProjectIdRouteImport } from './routes/_authenticated/projects_.$projectId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -30,9 +42,31 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAgentsRoute = AuthenticatedAgentsRouteImport.update({
+  id: '/agents',
+  path: '/agents',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAudioStudioRoute =
+  AuthenticatedAudioStudioRouteImport.update({
+    id: '/audio-studio',
+    path: '/audio-studio',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCharacterStudioRoute =
+  AuthenticatedCharacterStudioRouteImport.update({
+    id: '/character-studio',
+    path: '/character-studio',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedChatRoute = AuthenticatedChatRouteImport.update({
   id: '/chat',
   path: '/chat',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedContinuityRoute = AuthenticatedContinuityRouteImport.update({
+  id: '/continuity',
+  path: '/continuity',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
@@ -40,54 +74,181 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedPlayRoute = AuthenticatedPlayRouteImport.update({
-  id: '/play',
-  path: '/play',
+const AuthenticatedFrameControlRoute =
+  AuthenticatedFrameControlRouteImport.update({
+    id: '/frame-control',
+    path: '/frame-control',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedMemoireRoute = AuthenticatedMemoireRouteImport.update({
+  id: '/memoire',
+  path: '/memoire',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedProjectsRoute = AuthenticatedProjectsRouteImport.update({
+  id: '/projects',
+  path: '/projects',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSignalDeskRoute = AuthenticatedSignalDeskRouteImport.update({
+  id: '/signal-desk',
+  path: '/signal-desk',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedStudioRoute = AuthenticatedStudioRouteImport.update({
+  id: '/studio',
+  path: '/studio',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiVoiceRoute = ApiVoiceRouteImport.update({
+  id: '/api/voice',
+  path: '/api/voice',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedChatThreadIdRoute =
+  AuthenticatedChatThreadIdRouteImport.update({
+    id: '/chat_/$threadId',
+    path: '/chat/$threadId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedProjectsProjectIdRoute =
+  AuthenticatedProjectsProjectIdRouteImport.update({
+    id: '/projects_/$projectId',
+    path: '/projects/$projectId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/agents': typeof AuthenticatedAgentsRoute
+  '/audio-studio': typeof AuthenticatedAudioStudioRoute
+  '/character-studio': typeof AuthenticatedCharacterStudioRoute
   '/chat': typeof AuthenticatedChatRoute
+  '/continuity': typeof AuthenticatedContinuityRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/play': typeof AuthenticatedPlayRoute
+  '/frame-control': typeof AuthenticatedFrameControlRoute
+  '/memoire': typeof AuthenticatedMemoireRoute
+  '/projects': typeof AuthenticatedProjectsRoute
+  '/signal-desk': typeof AuthenticatedSignalDeskRoute
+  '/studio': typeof AuthenticatedStudioRoute
+  '/api/chat': typeof ApiChatRoute
+  '/api/voice': typeof ApiVoiceRoute
+  '/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
+  '/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/agents': typeof AuthenticatedAgentsRoute
+  '/audio-studio': typeof AuthenticatedAudioStudioRoute
+  '/character-studio': typeof AuthenticatedCharacterStudioRoute
   '/chat': typeof AuthenticatedChatRoute
+  '/continuity': typeof AuthenticatedContinuityRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/play': typeof AuthenticatedPlayRoute
+  '/frame-control': typeof AuthenticatedFrameControlRoute
+  '/memoire': typeof AuthenticatedMemoireRoute
+  '/projects': typeof AuthenticatedProjectsRoute
+  '/signal-desk': typeof AuthenticatedSignalDeskRoute
+  '/studio': typeof AuthenticatedStudioRoute
+  '/api/chat': typeof ApiChatRoute
+  '/api/voice': typeof ApiVoiceRoute
+  '/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
+  '/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/agents': typeof AuthenticatedAgentsRoute
+  '/_authenticated/audio-studio': typeof AuthenticatedAudioStudioRoute
+  '/_authenticated/character-studio': typeof AuthenticatedCharacterStudioRoute
   '/_authenticated/chat': typeof AuthenticatedChatRoute
+  '/_authenticated/continuity': typeof AuthenticatedContinuityRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/play': typeof AuthenticatedPlayRoute
+  '/_authenticated/frame-control': typeof AuthenticatedFrameControlRoute
+  '/_authenticated/memoire': typeof AuthenticatedMemoireRoute
+  '/_authenticated/projects': typeof AuthenticatedProjectsRoute
+  '/_authenticated/signal-desk': typeof AuthenticatedSignalDeskRoute
+  '/_authenticated/studio': typeof AuthenticatedStudioRoute
+  '/api/chat': typeof ApiChatRoute
+  '/api/voice': typeof ApiVoiceRoute
+  '/_authenticated/chat_/$threadId': typeof AuthenticatedChatThreadIdRoute
+  '/_authenticated/projects_/$projectId': typeof AuthenticatedProjectsProjectIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/chat' | '/dashboard' | '/play'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/agents'
+    | '/audio-studio'
+    | '/character-studio'
+    | '/chat'
+    | '/continuity'
+    | '/dashboard'
+    | '/frame-control'
+    | '/memoire'
+    | '/projects'
+    | '/signal-desk'
+    | '/studio'
+    | '/api/chat'
+    | '/api/voice'
+    | '/chat/$threadId'
+    | '/projects/$projectId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/chat' | '/dashboard' | '/play'
+  to:
+    | '/'
+    | '/auth'
+    | '/agents'
+    | '/audio-studio'
+    | '/character-studio'
+    | '/chat'
+    | '/continuity'
+    | '/dashboard'
+    | '/frame-control'
+    | '/memoire'
+    | '/projects'
+    | '/signal-desk'
+    | '/studio'
+    | '/api/chat'
+    | '/api/voice'
+    | '/chat/$threadId'
+    | '/projects/$projectId'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/agents'
+    | '/_authenticated/audio-studio'
+    | '/_authenticated/character-studio'
     | '/_authenticated/chat'
+    | '/_authenticated/continuity'
     | '/_authenticated/dashboard'
-    | '/_authenticated/play'
+    | '/_authenticated/frame-control'
+    | '/_authenticated/memoire'
+    | '/_authenticated/projects'
+    | '/_authenticated/signal-desk'
+    | '/_authenticated/studio'
+    | '/api/chat'
+    | '/api/voice'
+    | '/_authenticated/chat_/$threadId'
+    | '/_authenticated/projects_/$projectId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ApiChatRoute: typeof ApiChatRoute
+  ApiVoiceRoute: typeof ApiVoiceRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -113,11 +274,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/agents': {
+      id: '/_authenticated/agents'
+      path: '/agents'
+      fullPath: '/agents'
+      preLoaderRoute: typeof AuthenticatedAgentsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/audio-studio': {
+      id: '/_authenticated/audio-studio'
+      path: '/audio-studio'
+      fullPath: '/audio-studio'
+      preLoaderRoute: typeof AuthenticatedAudioStudioRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/character-studio': {
+      id: '/_authenticated/character-studio'
+      path: '/character-studio'
+      fullPath: '/character-studio'
+      preLoaderRoute: typeof AuthenticatedCharacterStudioRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/chat': {
       id: '/_authenticated/chat'
       path: '/chat'
       fullPath: '/chat'
       preLoaderRoute: typeof AuthenticatedChatRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/continuity': {
+      id: '/_authenticated/continuity'
+      path: '/continuity'
+      fullPath: '/continuity'
+      preLoaderRoute: typeof AuthenticatedContinuityRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard': {
@@ -127,26 +316,102 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/play': {
-      id: '/_authenticated/play'
-      path: '/play'
-      fullPath: '/play'
-      preLoaderRoute: typeof AuthenticatedPlayRouteImport
+    '/_authenticated/frame-control': {
+      id: '/_authenticated/frame-control'
+      path: '/frame-control'
+      fullPath: '/frame-control'
+      preLoaderRoute: typeof AuthenticatedFrameControlRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/memoire': {
+      id: '/_authenticated/memoire'
+      path: '/memoire'
+      fullPath: '/memoire'
+      preLoaderRoute: typeof AuthenticatedMemoireRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/projects': {
+      id: '/_authenticated/projects'
+      path: '/projects'
+      fullPath: '/projects'
+      preLoaderRoute: typeof AuthenticatedProjectsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/signal-desk': {
+      id: '/_authenticated/signal-desk'
+      path: '/signal-desk'
+      fullPath: '/signal-desk'
+      preLoaderRoute: typeof AuthenticatedSignalDeskRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/studio': {
+      id: '/_authenticated/studio'
+      path: '/studio'
+      fullPath: '/studio'
+      preLoaderRoute: typeof AuthenticatedStudioRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/voice': {
+      id: '/api/voice'
+      path: '/api/voice'
+      fullPath: '/api/voice'
+      preLoaderRoute: typeof ApiVoiceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/chat_/$threadId': {
+      id: '/_authenticated/chat_/$threadId'
+      path: '/chat/$threadId'
+      fullPath: '/chat/$threadId'
+      preLoaderRoute: typeof AuthenticatedChatThreadIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/projects_/$projectId': {
+      id: '/_authenticated/projects_/$projectId'
+      path: '/projects/$projectId'
+      fullPath: '/projects/$projectId'
+      preLoaderRoute: typeof AuthenticatedProjectsProjectIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAgentsRoute: typeof AuthenticatedAgentsRoute
+  AuthenticatedAudioStudioRoute: typeof AuthenticatedAudioStudioRoute
+  AuthenticatedCharacterStudioRoute: typeof AuthenticatedCharacterStudioRoute
   AuthenticatedChatRoute: typeof AuthenticatedChatRoute
+  AuthenticatedContinuityRoute: typeof AuthenticatedContinuityRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedPlayRoute: typeof AuthenticatedPlayRoute
+  AuthenticatedFrameControlRoute: typeof AuthenticatedFrameControlRoute
+  AuthenticatedMemoireRoute: typeof AuthenticatedMemoireRoute
+  AuthenticatedProjectsRoute: typeof AuthenticatedProjectsRoute
+  AuthenticatedSignalDeskRoute: typeof AuthenticatedSignalDeskRoute
+  AuthenticatedStudioRoute: typeof AuthenticatedStudioRoute
+  AuthenticatedChatThreadIdRoute: typeof AuthenticatedChatThreadIdRoute
+  AuthenticatedProjectsProjectIdRoute: typeof AuthenticatedProjectsProjectIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAgentsRoute: AuthenticatedAgentsRoute,
+  AuthenticatedAudioStudioRoute: AuthenticatedAudioStudioRoute,
+  AuthenticatedCharacterStudioRoute: AuthenticatedCharacterStudioRoute,
   AuthenticatedChatRoute: AuthenticatedChatRoute,
+  AuthenticatedContinuityRoute: AuthenticatedContinuityRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedPlayRoute: AuthenticatedPlayRoute,
+  AuthenticatedFrameControlRoute: AuthenticatedFrameControlRoute,
+  AuthenticatedMemoireRoute: AuthenticatedMemoireRoute,
+  AuthenticatedProjectsRoute: AuthenticatedProjectsRoute,
+  AuthenticatedSignalDeskRoute: AuthenticatedSignalDeskRoute,
+  AuthenticatedStudioRoute: AuthenticatedStudioRoute,
+  AuthenticatedChatThreadIdRoute: AuthenticatedChatThreadIdRoute,
+  AuthenticatedProjectsProjectIdRoute: AuthenticatedProjectsProjectIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -156,6 +421,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ApiChatRoute: ApiChatRoute,
+  ApiVoiceRoute: ApiVoiceRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,0 +1,7 @@
+// CERTIFIED_100=false | unique_human_proven=false | DEBUG
+import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+export const compareContinuity = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ projectId:z.string().uuid(), images: z.array(z.object({ type: z.string().regex(/^image\//), dataBase64: z.string().max(12000000) })).length(2) }).parse(d))
+  .handler(async ({ context,data }) => { const {error:projectError}=await context.supabase.from("production_projects").select("id").eq("id",data.projectId).eq("user_id",context.userId).single();if(projectError)throw new Error("Projet inaccessible."); const { askMavai, AiError } = await import("./mavai-ai.server"); try { return { ok: true as const, text: await askMavai({ history: [], text: "Compare ces deux images dans l’ordre : référence puis plan à vérifier. Agis en script supervisor. Repère une tasse disparue, un vêtement modifié, une lampe déplacée et toute différence de personnages/accessoires/décor. Pour chaque anomalie, indique position, observation dans chaque image, incertitude et correction proposée. Ne prétends pas connaître les éléments non visibles. Ne donne pas de score chiffré inventé. Conclus par les éléments que l’humain doit valider.", images: data.images, voice: false }) }; } catch(e) { return { ok: false as const, error: e instanceof AiError ? e.message : "Comparaison impossible." }; } });

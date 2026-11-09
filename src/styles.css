@@ -4,18 +4,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/*
- * Design system definition — MAVAI Bronze Theme
- *
- * Palette:
- *   --background   #6B4427  dark walnut brown
- *   --card         #59371F  deeper brown
- *   --foreground   #FFF3DF  warm ivory
- *   --accent       #CD7F32  bronze gold
- *   --muted        #E0C6AA  sand muted
- *
- * All colors use oklch format as required by Tailwind v4.
- */
+/* MAVAI design tokens — white default, .dark = black theme */
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -58,99 +47,87 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-bubble-user: var(--bubble-user);
+  --color-bubble-user-foreground: var(--bubble-user-foreground);
+  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
 }
 
-/* ─── Bronze theme — unique (no dark variant needed, theme is always dark-warm) ─── */
+/* ─── MAVAI — white by default, optional black theme ─── */
 :root {
-  --radius: 0.75rem;
-
-  /* #6B4427 — walnut bg */
-  --background: oklch(0.38 0.075 49);
-  /* #FFF3DF — ivory ink */
-  --foreground: oklch(0.97 0.028 80);
-
-  /* #59371F — deeper card */
-  --card: oklch(0.32 0.075 49);
-  --card-foreground: oklch(0.97 0.028 80);
-
-  --popover: oklch(0.32 0.075 49);
-  --popover-foreground: oklch(0.97 0.028 80);
-
-  /* #CD7F32 — bronze accent as primary */
-  --primary: oklch(0.65 0.12 58);
-  --primary-foreground: oklch(0.18 0.04 49);
-
-  /* slightly lighter brown for secondary surfaces */
-  --secondary: oklch(0.44 0.075 49);
-  --secondary-foreground: oklch(0.97 0.028 80);
-
-  /* #E0C6AA — sandy muted */
-  --muted: oklch(0.44 0.04 60);
-  --muted-foreground: oklch(0.83 0.045 68);
-
-  /* #CD7F32 — bronze accent */
-  --accent: oklch(0.65 0.12 58);
-  --accent-foreground: oklch(0.18 0.04 49);
-
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.97 0.028 80);
-
-  /* subtle warm border */
-  --border: oklch(1 0 0 / 15%);
-  --input: oklch(1 0 0 / 20%);
-  --ring: oklch(0.65 0.12 58);
-
-  --chart-1: oklch(0.65 0.12 58);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-
-  --sidebar: oklch(0.32 0.075 49);
-  --sidebar-foreground: oklch(0.97 0.028 80);
-  --sidebar-primary: oklch(0.65 0.12 58);
-  --sidebar-primary-foreground: oklch(0.18 0.04 49);
-  --sidebar-accent: oklch(0.44 0.075 49);
-  --sidebar-accent-foreground: oklch(0.97 0.028 80);
-  --sidebar-border: oklch(1 0 0 / 15%);
-  --sidebar-ring: oklch(0.65 0.12 58);
+  --voice-assistant: #dc2626;
+  --voice-human: #2563eb;
+  --radius: 0.875rem;
+  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.17 0.01 260);
+  --card: oklch(0.985 0.002 260);
+  --card-foreground: oklch(0.17 0.01 260);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.17 0.01 260);
+  --primary: oklch(0.17 0.01 260);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.96 0.003 260);
+  --secondary-foreground: oklch(0.2 0.01 260);
+  --muted: oklch(0.965 0.003 260);
+  --muted-foreground: oklch(0.5 0.01 260);
+  --accent: oklch(0.62 0.19 255);
+  --accent-foreground: oklch(0.99 0 0);
+  --destructive: oklch(0.58 0.22 25);
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: oklch(0.91 0.004 260);
+  --input: oklch(0.91 0.004 260);
+  --ring: oklch(0.62 0.19 255);
+  --bubble-user: oklch(0.17 0.01 260);
+  --bubble-user-foreground: oklch(0.99 0 0);
+  --chart-1: oklch(0.62 0.19 255);
+  --chart-2: oklch(0.7 0.15 162);
+  --chart-3: oklch(0.77 0.17 70);
+  --chart-4: oklch(0.63 0.25 304);
+  --chart-5: oklch(0.65 0.24 16);
+  --sidebar: oklch(0.985 0.002 260);
+  --sidebar-foreground: oklch(0.17 0.01 260);
+  --sidebar-primary: oklch(0.17 0.01 260);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(0.96 0.003 260);
+  --sidebar-accent-foreground: oklch(0.2 0.01 260);
+  --sidebar-border: oklch(0.91 0.004 260);
+  --sidebar-ring: oklch(0.62 0.19 255);
 }
 
-/* Keep .dark identical — design is intentionally always warm/dark */
 .dark {
-  --radius: 0.75rem;
-  --background: oklch(0.38 0.075 49);
-  --foreground: oklch(0.97 0.028 80);
-  --card: oklch(0.32 0.075 49);
-  --card-foreground: oklch(0.97 0.028 80);
-  --popover: oklch(0.32 0.075 49);
-  --popover-foreground: oklch(0.97 0.028 80);
-  --primary: oklch(0.65 0.12 58);
-  --primary-foreground: oklch(0.18 0.04 49);
-  --secondary: oklch(0.44 0.075 49);
-  --secondary-foreground: oklch(0.97 0.028 80);
-  --muted: oklch(0.44 0.04 60);
-  --muted-foreground: oklch(0.83 0.045 68);
-  --accent: oklch(0.65 0.12 58);
-  --accent-foreground: oklch(0.18 0.04 49);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.97 0.028 80);
-  --border: oklch(1 0 0 / 15%);
-  --input: oklch(1 0 0 / 20%);
-  --ring: oklch(0.65 0.12 58);
-  --chart-1: oklch(0.65 0.12 58);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.445);
-  --sidebar: oklch(0.32 0.075 49);
-  --sidebar-foreground: oklch(0.97 0.028 80);
-  --sidebar-primary: oklch(0.65 0.12 58);
-  --sidebar-primary-foreground: oklch(0.18 0.04 49);
-  --sidebar-accent: oklch(0.44 0.075 49);
-  --sidebar-accent-foreground: oklch(0.97 0.028 80);
-  --sidebar-border: oklch(1 0 0 / 15%);
-  --sidebar-ring: oklch(0.65 0.12 58);
+  --voice-assistant: #fb7185;
+  --voice-human: #60a5fa;
+  --background: oklch(0.13 0.005 260);
+  --foreground: oklch(0.97 0 0);
+  --card: oklch(0.17 0.006 260);
+  --card-foreground: oklch(0.97 0 0);
+  --popover: oklch(0.17 0.006 260);
+  --popover-foreground: oklch(0.97 0 0);
+  --primary: oklch(0.97 0 0);
+  --primary-foreground: oklch(0.15 0.005 260);
+  --secondary: oklch(0.22 0.006 260);
+  --secondary-foreground: oklch(0.97 0 0);
+  --muted: oklch(0.21 0.006 260);
+  --muted-foreground: oklch(0.7 0.01 260);
+  --accent: oklch(0.7 0.16 255);
+  --accent-foreground: oklch(0.13 0.005 260);
+  --destructive: oklch(0.65 0.2 25);
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.7 0.16 255);
+  --bubble-user: oklch(0.97 0 0);
+  --bubble-user-foreground: oklch(0.15 0.005 260);
+  --sidebar: oklch(0.17 0.006 260);
+  --sidebar-foreground: oklch(0.97 0 0);
+  --sidebar-primary: oklch(0.97 0 0);
+  --sidebar-primary-foreground: oklch(0.15 0.005 260);
+  --sidebar-accent: oklch(0.22 0.006 260);
+  --sidebar-accent-foreground: oklch(0.97 0 0);
+  --sidebar-border: oklch(1 0 0 / 12%);
+  --sidebar-ring: oklch(0.7 0.16 255);
 }
 
 @layer base {
@@ -161,5 +138,26 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: var(--font-body);
+  }
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    letter-spacing: 0;
   }
 }
+
+.prose-mavai > * + * { margin-top: 0.6em; }
+.prose-mavai h1, .prose-mavai h2, .prose-mavai h3 { font-weight: 600; font-size: 1.05em; margin-top: 1em; }
+.prose-mavai ul { list-style: disc; padding-left: 1.25em; }
+.prose-mavai ol { list-style: decimal; padding-left: 1.25em; }
+.prose-mavai a { text-decoration: underline; }
+.prose-mavai code { background: var(--secondary); padding: 0.1em 0.3em; border-radius: 0.25em; }
+.prose-mavai pre { background: var(--secondary); padding: 0.75em; border-radius: 0.5em; overflow-x: auto; }
+.prose-mavai table { border-collapse: collapse; }
+.prose-mavai th, .prose-mavai td { border: 1px solid var(--border); padding: 0.25em 0.5em; }
+
+.voice-tracks { display: grid; gap: 4px; width: 100%; }
+.voice-track { display: grid; grid-template-columns: 56px minmax(0, 1fr); align-items: center; min-height: 40px; font-size: 12px; }
+.voice-track canvas { display: block; width: 100%; height: 40px; }
+.voice-track:first-child { color: var(--voice-assistant); }
+.voice-track:last-child { color: var(--voice-human); }

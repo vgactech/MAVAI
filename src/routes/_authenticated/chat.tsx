@@ -1,190 +1,42 @@
-/**
- * /chat route — protected main interface of MAVAI.
- * Displays ChatFeed + ChatComposer + Mascot.
- * Sends messages via sendMessageFn (TanStack Start createServerFn — ARTcB or OpenAI).
- * DEBUG MODE ACTIVE
- * CERTIFIED_100=false | unique_human_proven=false
- */
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
+import { zodValidator } from '@tanstack/zod-adapter';
+import { z } from 'zod';
+import { useServerFn } from '@tanstack/react-start';
+import { useEffect, useRef, useState } from 'react';
+import type { UIMessage } from 'ai';
+import { Plus, ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { MavaiMark } from '@/components/MavaiMark';
+import { StreamingChat } from '@/components/StreamingChat';
+import { getConversation } from '@/lib/modules.functions';
+import { ProjectWorkspace } from '@/components/ProjectWorkspace';
 
-import { createFileRoute } from "@tanstack/react-router";
-import { useState, useCallback, useId } from "react";
-import { ChatFeed } from "@/components/chat/ChatFeed";
-import { ChatComposer, type ComposerSubmitPayload } from "@/components/chat/ChatComposer";
-import { Mascot } from "@/components/chat/Mascot";
-import { outbox } from "@/lib/outbox";
-import type { ChatMessage, ChatMode } from "@/types/mavai";
-import { sendMessageFn } from "@/server-functions/send-message";
-
-// Route registered after routeTree is generated — no-op type cast until regen
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const Route = (createFileRoute as any)("/_authenticated/chat")({
-  head: () => ({
-    meta: [
-      { title: "Chat — MAVAI" },
-      { name: "description", content: "Votre assistant personnel MAVAI." },
-    ],
-  }),
-  component: ChatRoute,
+export const Route = createFileRoute('/_authenticated/chat')({
+  head:()=>({meta:[{title:'Chat texte et voix — MAVAI'},{name:'description',content:'Conversation privée MAVAI : texte progressif et échanges vocaux.'},{property:'og:title',content:'Chat texte et voix — MAVAI'},{property:'og:description',content:'Votre conversation avec MAVAI, par écrit et à voix haute.'},{property:'og:type',content:'website'},{name:'twitter:card',content:'summary'}]}),
+  validateSearch:zodValidator(z.object({c:z.string().optional(),project:z.string().uuid().optional()})),component:ChatPage,
 });
-
-function nanoid(): string {
-  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
-}
-
-function ChatRoute() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { user } = (Route as any).useRouteContext() as {
-    user: { id: string; email?: string; name?: string };
-  };
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [mode, setMode] = useState<ChatMode>("chat");
-  const [loading, setLoading] = useState(false);
-  const [mascotTalking, setMascotTalking] = useState(false);
-  const sessionId = useId();
-
-  const handleSubmit = useCallback(
-    async (payload: ComposerSubmitPayload) => {
-      if (loading) return;
-
-      // 1. Create user message
-      const userMsg: ChatMessage = {
-        id: nanoid(),
-        role: "user",
-        content:
-          payload.text ||
-          (payload.files.length > 0 ? `[${payload.files.length} fichier(s) joint(s)]` : ""),
-        createdAt: new Date().toISOString(),
-        mode: payload.mode,
-      };
-
-      // 2. Enqueue in durable outbox (survives page refresh)
-      outbox.enqueue(userMsg);
-
-      // 3. Optimistic update
-      setMessages((prev) => [...prev, userMsg]);
-      setLoading(true);
-      setMascotTalking(true);
-
-      try {
-        // 4. Prepare file list for sendMessageFn (base64 encoded)
-        const files: Array<{ name: string; type: string; dataBase64: string; sizeBytes: number }> = [];
-        for (const f of payload.files) {
-          if (f instanceof File && f.size > 0) {
-            const buf = await f.arrayBuffer();
-            const base64 = btoa(String.fromCharCode(...new Uint8Array(buf)));
-            files.push({ name: f.name, type: f.type || "application/octet-stream", dataBase64: base64, sizeBytes: f.size });
-          }
-        }
-
-        // 5. Call TanStack Start server function (replaces fetch("/api/messages"))
-        const data = await sendMessageFn({
-          data: {
-            text: payload.text,
-            mode: payload.mode,
-            sessionId,
-            userId: user.id,
-            userMessageId: userMsg.id,
-            files,
-          },
-        });
-
-        // 6. Build assistant message
-        const assistantMsg: ChatMessage = {
-          id: nanoid(),
-          role: "assistant",
-          content: data.reply,
-          createdAt: new Date().toISOString(),
-          mode: payload.mode,
-          ...(data.audioUrl !== undefined ? { audioUrl: data.audioUrl } : {}),
-        };
-
-        // 7. Mark outbox entry as sent, append assistant message
-        outbox.markSent(userMsg.id);
-        setMessages((prev) => [...prev, assistantMsg]);
-      } catch (err: unknown) {
-        const errorText = err instanceof Error ? err.message : "Erreur inconnue";
-        console.error("[DEBUG][chat] handleSubmit error:", err);
-
-        // Append error message in feed
-        const errMsg: ChatMessage = {
-          id: nanoid(),
-          role: "assistant",
-          content: `⚠️ ${errorText}. Votre message est conservé dans la file d'envoi.`,
-          createdAt: new Date().toISOString(),
-          mode: payload.mode,
-        };
-        setMessages((prev) => [...prev, errMsg]);
-        outbox.markFailed(userMsg.id);
-      } finally {
-        setLoading(false);
-        setMascotTalking(false);
-      }
-    },
-    [loading, sessionId, user.id],
-  );
-
-  return (
-    <div
-      aria-label="Interface de chat MAVAI"
-      style={{
-        height: "100dvh",
-        display: "flex",
-        flexDirection: "column",
-        background: "oklch(0.38 0.075 49)",
-        overflow: "hidden",
-      }}
-    >
-      {/* Header */}
-      <header
-        style={{
-          padding: "10px 16px",
-          background: "oklch(0.32 0.075 49)",
-          borderBottom: "1px solid oklch(0.45 0.075 49)",
-          display: "flex",
-          alignItems: "center",
-          gap: 10,
-          flexShrink: 0,
-        }}
-      >
-        <a
-          href="/dashboard"
-          aria-label="Retour au tableau de bord"
-          style={{ color: "#cd7f32", textDecoration: "none", fontSize: 20 }}
-        >
-          ←
-        </a>
-        <span style={{ color: "#fff3df", fontWeight: 600, fontSize: 17 }}>MAVAI Chat</span>
-        {mode !== "chat" && (
-          <span
-            style={{
-              fontSize: 12,
-              color: "#e0c6aa",
-              background: "oklch(0.28 0.075 49)",
-              padding: "2px 8px",
-              borderRadius: 6,
-            }}
-          >
-            {mode === "voice" ? "🎙️ Vocal" : "📁 Documents"}
-          </span>
-        )}
-        <div style={{ flex: 1 }} />
-        <span style={{ fontSize: 12, color: "#e0c6aa", opacity: 0.6 }}>
-          {user.email ?? user.name ?? ""}
-        </span>
-      </header>
-
-      {/* Feed — grows to fill available space */}
-      <ChatFeed messages={messages} loading={loading} />
-
-      {/* Composer — pinned at bottom */}
-      <ChatComposer mode={mode} onModeChange={setMode} onSubmit={handleSubmit} disabled={loading} />
-
-      {/* Floating mascot */}
-      <Mascot
-        talking={mascotTalking}
-        pose={loading ? "curious" : "classic"}
-        statusLabel={loading ? "MAVAI réfléchit…" : "MAVAI est prêt"}
-      />
-    </div>
-  );
+function ChatPage() {
+  const {c,project}=Route.useSearch(); const load=useServerFn(getConversation); const navigate=useNavigate();
+  const loadRef=useRef(load);loadRef.current=load;
+  const [initial,setInitial]=useState<UIMessage[]>([]);const [loading,setLoading]=useState(Boolean(c));const [error,setError]=useState<string|null>(null);
+  const [sessionEpoch,setSessionEpoch]=useState(0);const owner=useRef(c ?? null);const created=useRef<string|null>(null);
+  useEffect(()=>{
+    if(c && c===created.current){created.current=null;return;}
+    let cancelled=false;
+    setSessionEpoch(n=>n+1);owner.current=c ?? null;setError(null);setInitial([]);setLoading(Boolean(c));
+    if(c) void loadRef.current({data:{id:c,projectId:project}}).then(rows=>{
+      if(cancelled)return;
+      setInitial(rows.map(r=>({id:r.client_message_id??r.id,role:r.role,metadata:r.metadata,parts:r.metadata?.parts as unknown as UIMessage['parts'] ?? [{type:'text',text:r.content}]})));setLoading(false);
+    }).catch(e=>{if(!cancelled){setError(e.message);setLoading(false);}});
+    return()=>{cancelled=true;};
+  },[c,project]);
+  return <div className="flex h-dvh flex-col bg-background text-foreground">
+    <header className="flex shrink-0 items-center gap-2 border-b border-border px-3 py-2">
+      <Button asChild variant="ghost" size="icon-sm" aria-label="Retour au tableau de bord"><Link to="/dashboard"><ArrowLeft className="size-4"/></Link></Button>
+      <MavaiMark className="size-7"/><span className="font-display font-semibold">MAVAI</span><div className="flex-1"/>
+      <Button variant="ghost" size="sm" onClick={()=>{setSessionEpoch(n=>n+1);owner.current=null;setInitial([]);navigate({to:'/chat',search:{project}});}}><Plus className="size-4"/>Nouvelle</Button><ThemeToggle/>
+    </header>
+    <ProjectWorkspace required={!c}>{loading?<p role="status" className="p-6">Chargement de la conversation…</p>:error?<p role="alert" className="p-6 text-destructive">{error}</p>:<StreamingChat key={sessionEpoch} id={owner.current} initialMessages={initial} onConversation={id=>{owner.current=id;created.current=id;void navigate({to:'/chat',search:{c:id,project},replace:true});}}/>}</ProjectWorkspace>
+  </div>;
 }

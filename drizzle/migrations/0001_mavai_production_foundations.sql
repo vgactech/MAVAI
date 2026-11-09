@@ -1,0 +1,16 @@
+CREATE TABLE public.production_projects (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), user_id uuid NOT NULL, title text NOT NULL, description text NOT NULL DEFAULT '', created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now());
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.production_projects TO authenticated;
+GRANT ALL ON public.production_projects TO service_role;
+ALTER TABLE public.production_projects ENABLE ROW LEVEL SECURITY;
+CREATE POLICY project_owner ON public.production_projects FOR ALL TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+CREATE TABLE public.production_items (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), project_id uuid NOT NULL REFERENCES public.production_projects(id) ON DELETE CASCADE, user_id uuid NOT NULL, kind text NOT NULL CHECK (kind IN ('character','scene','shot','asset','decision','audio','frame','continuity','storyboard')), title text NOT NULL, content text NOT NULL DEFAULT '', data jsonb NOT NULL DEFAULT '{}', validated boolean NOT NULL DEFAULT false, version integer NOT NULL DEFAULT 1, created_at timestamptz NOT NULL DEFAULT now());
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.production_items TO authenticated;
+GRANT ALL ON public.production_items TO service_role;
+ALTER TABLE public.production_items ENABLE ROW LEVEL SECURITY;
+CREATE POLICY item_owner ON public.production_items FOR ALL TO authenticated USING (auth.uid() = user_id AND EXISTS (SELECT 1 FROM public.production_projects p WHERE p.id = project_id AND p.user_id = auth.uid())) WITH CHECK (auth.uid() = user_id AND EXISTS (SELECT 1 FROM public.production_projects p WHERE p.id = project_id AND p.user_id = auth.uid()));
+CREATE INDEX production_items_project_idx ON public.production_items(project_id,created_at);
+ALTER TABLE public.messages ADD COLUMN IF NOT EXISTS metadata jsonb NOT NULL DEFAULT '{}';
+ALTER TABLE public.messages ADD COLUMN IF NOT EXISTS client_message_id text;
+CREATE UNIQUE INDEX IF NOT EXISTS messages_client_id_idx ON public.messages(user_id,client_message_id) WHERE client_message_id IS NOT NULL;
+ALTER TABLE public.conversations ADD COLUMN IF NOT EXISTS project_id uuid REFERENCES public.production_projects(id);
+ALTER TABLE public.works ADD COLUMN IF NOT EXISTS project_id uuid REFERENCES public.production_projects(id);
