@@ -1,0 +1,13 @@
+ALTER TABLE public.production_projects ADD COLUMN IF NOT EXISTS target_duration_seconds integer CHECK (target_duration_seconds IS NULL OR (target_duration_seconds > 0 AND target_duration_seconds <= 86400));
+CREATE TABLE public.production_nodes (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), project_id uuid NOT NULL REFERENCES public.production_projects(id) ON DELETE CASCADE, user_id uuid NOT NULL, parent_id uuid REFERENCES public.production_nodes(id) ON DELETE CASCADE, kind text NOT NULL, position integer NOT NULL DEFAULT 0, archived_at timestamptz, created_at timestamptz NOT NULL DEFAULT now());
+GRANT SELECT, INSERT, UPDATE ON public.production_nodes TO authenticated;
+GRANT ALL ON public.production_nodes TO service_role;
+ALTER TABLE public.production_nodes ENABLE ROW LEVEL SECURITY;
+CREATE POLICY node_owner ON public.production_nodes FOR ALL TO authenticated USING (auth.uid() = user_id AND EXISTS (SELECT 1 FROM public.production_projects p WHERE p.id = project_id AND p.user_id = auth.uid())) WITH CHECK (auth.uid() = user_id AND EXISTS (SELECT 1 FROM public.production_projects p WHERE p.id = project_id AND p.user_id = auth.uid()));
+CREATE INDEX production_nodes_project_idx ON public.production_nodes(project_id, parent_id, position);
+CREATE TABLE public.production_node_versions (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), node_id uuid NOT NULL REFERENCES public.production_nodes(id) ON DELETE CASCADE, user_id uuid NOT NULL, version integer NOT NULL, title text NOT NULL, content text NOT NULL DEFAULT '', data jsonb NOT NULL DEFAULT '{}', note text NOT NULL DEFAULT '', created_at timestamptz NOT NULL DEFAULT now(), UNIQUE (node_id, version));
+GRANT SELECT, INSERT ON public.production_node_versions TO authenticated;
+GRANT ALL ON public.production_node_versions TO service_role;
+ALTER TABLE public.production_node_versions ENABLE ROW LEVEL SECURITY;
+CREATE POLICY version_read ON public.production_node_versions FOR SELECT TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY version_insert ON public.production_node_versions FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id AND EXISTS (SELECT 1 FROM public.production_nodes n WHERE n.id = node_id AND n.user_id = auth.uid()));

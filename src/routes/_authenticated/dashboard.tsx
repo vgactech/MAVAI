@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { Brain, Clapperboard, LogOut, MessageSquare, Radar, Users } from "lucide-react";
+import { Brain, Clapperboard, LogOut, Settings, MessageSquare, Radar, Users } from "lucide-react";
 import { signOutUser } from "@/lib/auth-session";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -73,6 +73,9 @@ function Dashboard() {
         </Link>
         <div className="flex-1" />
         <span className="hidden text-xs text-muted-foreground sm:inline">{user.email}</span>
+        <Button asChild variant="ghost" size="icon" aria-label="Paramètres">
+          <Link to="/parametres"><Settings className="size-4" /></Link>
+        </Button>
         <ThemeToggle />
         <Button variant="ghost" size="icon" onClick={signOut} aria-label="Se déconnecter">
           <LogOut className="size-4" />
@@ -86,7 +89,7 @@ function Dashboard() {
         </h1>
 
         <Link
-          to="/chat"
+          to="/projects"
           className="group mt-8 flex flex-col gap-4 rounded-3xl bg-primary p-8 text-primary-foreground transition hover:opacity-95 sm:flex-row sm:items-center"
         >
           <MessageSquare className="size-10 shrink-0" />

@@ -36,9 +36,19 @@ use the editor.
 - ARTcB text calls use the server-only bridge in `src/lib/artcb.server.ts` with the configured HTTPS URL; encoding receipts are not AI answers, so retain Lovable AI for actual answers when ARTcB only acknowledges storage.
 - Showcase videos use CDN asset pointers and a reusable player; keep large rendered media outside the repository to preserve deployability.
 - The canonical /chat surface uses AI SDK streaming and one FIFO controller for text and voice; authenticated HTTP voice requests propagate cancellation, and each turn owns all audible playback before the next starts.
+- /api/chat accepts only the newest user turn and rebuilds history from the database (text and images only); preparation stages stream as id-stable `data-step` parts persisted with the answer, so live reasoning survives reloads and never reaches model context.
+- /chat without a conversation renders the hub (projects + every conversation via `listConversations({all:true})`), never an empty chat; new conversations always start inside a project.
 - Production resources live in owner-scoped projects and items; browser audio and frame tools preserve original inputs rather than pretending to supply external inference engines.
 - Project selection is URL-derived and shared across module navigation; new work, conversations, memory and media outputs are project-scoped, with database owner validation, to prevent cross-project leakage while retaining legacy unassigned data.
 - Character references are validated inline image data and immutable owner-scoped item versions, so revisions never overwrite an approved reference.
 - Music composition is explicitly initiated and claimed by an owner-scoped item ID before billing; playback and mixing reuse its retained completed bytes.
 
 - Imported audio/video and local frame outputs are retained in project-keyed IndexedDB with owner-scoped cloud metadata; never imply these browser-local files sync to other devices.
+- Conversations are archived via conversations.archived_at (null = active); lists hide archived rows unless asked, so archiving is reversible.
+- Per-user GitHub memory: each chat turn is committed (KLERIO layout) to the owner's private repo after verifying repo id + owner marker; connection keys stored encrypted server-side only.
+- User-owned external AI keys live encrypted in user_api_credentials, accessed only by server functions after a live provider check; never exposed to the browser.
+- The chat answers with the user's most recently connected chat-capable external key (direct provider call); up-front provider failures emit a French warning step and fall back to Lovable AI.
+- Production tree: production_nodes hold structure; production_node_versions are insert-only (no update/delete grants), so edits and restores always append a version.
+- Project and conversation rename actions share a dialog and owner-scoped update functions; titles change without replacing records or message history.
+- Shared answer instructions govern both streaming and legacy chat; personal display rules must not become mandatory for all users.
+- Audio wave canvases overlay only the composer top border and read the existing analyser nodes; the fixed sides and bottom never animate.

@@ -2,6 +2,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { renameProjectSchema } from './rename-record';
 
 export const itemKinds = ["character", "scene", "shot", "asset", "decision", "audio", "frame", "continuity", "storyboard"] as const;
 export const listProjects = createServerFn({ method: "GET" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
@@ -15,6 +16,13 @@ export const createProject = createServerFn({ method: "POST" }).middleware([requ
     const { data: row, error } = await context.supabase.from("production_projects").insert({ ...data, user_id: context.userId }).select("*").single();
     if (error) throw new Error("Impossible de créer le projet.");
     console.debug("[production] project created");
+    return row;
+  });
+export const renameProject = createServerFn({ method: 'POST' }).middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => renameProjectSchema.parse(d))
+  .handler(async ({ context, data }) => {
+    const { data: row, error } = await context.supabase.from('production_projects').update({ title: data.title, updated_at: new Date().toISOString() }).eq('id', data.id).eq('user_id', context.userId).select('id,title').single();
+    if (error || !row) throw new Error('Projet inaccessible ou renommage impossible.');
     return row;
   });
 export const getProject = createServerFn({ method: "GET" }).middleware([requireSupabaseAuth])

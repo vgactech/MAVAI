@@ -2,8 +2,8 @@
 
 # Cap
 
-Les utilisateurs obtiennent l'aide qu'ils sont venus chercher auprès de leur compagnon IA.
+Les créateurs audiovisuels terminent les productions qu'ils ont entrepris de réaliser.
 
 ## Indicateur
 
-Sessions de chat où l'assistant a répondu, chaque jour
+Conversations où l'assistant a fourni une réponse chaque jour

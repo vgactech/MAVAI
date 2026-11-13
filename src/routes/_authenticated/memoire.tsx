@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ModuleShell } from "@/components/ModuleShell";
+import { GitHubMemoryCard } from "@/components/GitHubMemoryCard";
 import {
   addMemory,
   deleteConversation,
@@ -56,6 +57,7 @@ function MemoryPage() {
 
   return (
     <ModuleShell title="Mémoire" subtitle="Ce que MAVAI retient de vous, et l'historique de vos conversations.">
+      <GitHubMemoryCard />
       <section>
         <h2 className="font-semibold">Ce que MAVAI sait de vous</h2>
         <p className="text-xs text-muted-foreground">Ces faits sont utilisés dans chaque conversation.</p>

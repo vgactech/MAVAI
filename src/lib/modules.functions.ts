@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { renameConversationSchema } from './rename-record';
 
 type Ok<T> = { ok: true } & T;
 type Err = { ok: false; error: string };
@@ -15,15 +16,18 @@ async function aiErr(e: unknown): Promise<Err> {
 
 export const listConversations = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d:unknown)=>z.object({projectId:z.string().uuid().optional()}).parse(d??{}))
+  .inputValidator((d:unknown)=>z.object({projectId:z.string().uuid().optional(),all:z.boolean().optional(),archived:z.boolean().optional()}).parse(d??{}))
   .handler(async ({ context, data: scope }) => {
-    const { data, error } = await context.supabase
+    // `all` lists every conversation of the owner (chat hub); otherwise one project or the unassigned ones.
+    let query = context.supabase
       .from("conversations")
-      .select("id,title,updated_at,project_id")
-      .eq("user_id",context.userId)
-      .filter("project_id",scope.projectId?"eq":"is",scope.projectId??null)
+      .select("id,title,updated_at,project_id,archived_at")
+      .eq("user_id",context.userId);
+    query = scope.archived ? query.not("archived_at","is",null) : query.is("archived_at",null);
+    if (!scope.all) query = query.filter("project_id",scope.projectId?"eq":"is",scope.projectId??null);
+    const { data, error } = await query
       .order("updated_at", { ascending: false })
-      .limit(100);
+      .limit(200);
     if (error) throw new Error(error.message);
     return data;
   });
@@ -47,7 +51,29 @@ export const deleteConversation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
-    await context.supabase.from("conversations").delete().eq("id", data.id);
+    const { error } = await context.supabase.from("conversations").delete().eq("id", data.id).eq("user_id", context.userId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+/** Move a conversation to another owned project, or archive/unarchive it. */
+export const renameConversation = createServerFn({ method: 'POST' }).middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => renameConversationSchema.parse(d))
+  .handler(async ({ context, data }) => {
+    const { data: row, error } = await context.supabase.from('conversations').update({ title: data.title, updated_at: new Date().toISOString() }).eq('id', data.id).eq('user_id', context.userId).select('id,title').single();
+    if (error || !row) throw new Error('Chat inaccessible ou renommage impossible.');
+    return row;
+  });
+
+export const updateConversation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid(), projectId: z.string().uuid().optional(), archived: z.boolean().optional() }).parse(d))
+  .handler(async ({ context, data }) => {
+    const patch: { project_id?: string; archived_at?: string | null } = {};
+    if (data.projectId) patch.project_id = data.projectId;
+    if (data.archived !== undefined) patch.archived_at = data.archived ? new Date().toISOString() : null;
+    const { error } = await context.supabase.from("conversations").update(patch).eq("id", data.id).eq("user_id", context.userId);
+    if (error) throw new Error(error.code === "42501" ? "Ce projet ne vous appartient pas." : error.message);
     return { ok: true };
   });
 

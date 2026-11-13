@@ -18,8 +18,11 @@ import { Route as AuthenticatedCharacterStudioRouteImport } from './routes/_auth
 import { Route as AuthenticatedChatRouteImport } from './routes/_authenticated/chat'
 import { Route as AuthenticatedContinuityRouteImport } from './routes/_authenticated/continuity'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedDecoupageRouteImport } from './routes/_authenticated/decoupage'
 import { Route as AuthenticatedFrameControlRouteImport } from './routes/_authenticated/frame-control'
 import { Route as AuthenticatedMemoireRouteImport } from './routes/_authenticated/memoire'
+import { Route as AuthenticatedParametresRouteImport } from './routes/_authenticated/parametres'
+import { Route as AuthenticatedPlayRouteImport } from './routes/_authenticated/play'
 import { Route as AuthenticatedProjectsRouteImport } from './routes/_authenticated/projects'
 import { Route as AuthenticatedSignalDeskRouteImport } from './routes/_authenticated/signal-desk'
 import { Route as AuthenticatedStudioRouteImport } from './routes/_authenticated/studio'
@@ -27,6 +30,7 @@ import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as ApiVoiceRouteImport } from './routes/api/voice'
 import { Route as AuthenticatedChatThreadIdRouteImport } from './routes/_authenticated/chat_.$threadId'
 import { Route as AuthenticatedProjectsProjectIdRouteImport } from './routes/_authenticated/projects_.$projectId'
+import { Route as ApiOauthGithubReturnRouteImport } from './routes/api/oauth/github/return'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -74,6 +78,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDecoupageRoute = AuthenticatedDecoupageRouteImport.update({
+  id: '/decoupage',
+  path: '/decoupage',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedFrameControlRoute =
   AuthenticatedFrameControlRouteImport.update({
     id: '/frame-control',
@@ -83,6 +92,16 @@ const AuthenticatedFrameControlRoute =
 const AuthenticatedMemoireRoute = AuthenticatedMemoireRouteImport.update({
   id: '/memoire',
   path: '/memoire',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedParametresRoute = AuthenticatedParametresRouteImport.update({
+  id: '/parametres',
+  path: '/parametres',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPlayRoute = AuthenticatedPlayRouteImport.update({
+  id: '/play',
+  path: '/play',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedProjectsRoute = AuthenticatedProjectsRouteImport.update({
@@ -122,6 +141,11 @@ const AuthenticatedProjectsProjectIdRoute =
     path: '/projects/$projectId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiOauthGithubReturnRoute = ApiOauthGithubReturnRouteImport.update({
+  id: '/api/oauth/github/return',
+  path: '/api/oauth/github/return',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -132,8 +156,11 @@ export interface FileRoutesByFullPath {
   '/chat': typeof AuthenticatedChatRoute
   '/continuity': typeof AuthenticatedContinuityRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/decoupage': typeof AuthenticatedDecoupageRoute
   '/frame-control': typeof AuthenticatedFrameControlRoute
   '/memoire': typeof AuthenticatedMemoireRoute
+  '/parametres': typeof AuthenticatedParametresRoute
+  '/play': typeof AuthenticatedPlayRoute
   '/projects': typeof AuthenticatedProjectsRoute
   '/signal-desk': typeof AuthenticatedSignalDeskRoute
   '/studio': typeof AuthenticatedStudioRoute
@@ -141,6 +168,7 @@ export interface FileRoutesByFullPath {
   '/api/voice': typeof ApiVoiceRoute
   '/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
   '/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
+  '/api/oauth/github/return': typeof ApiOauthGithubReturnRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -151,8 +179,11 @@ export interface FileRoutesByTo {
   '/chat': typeof AuthenticatedChatRoute
   '/continuity': typeof AuthenticatedContinuityRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/decoupage': typeof AuthenticatedDecoupageRoute
   '/frame-control': typeof AuthenticatedFrameControlRoute
   '/memoire': typeof AuthenticatedMemoireRoute
+  '/parametres': typeof AuthenticatedParametresRoute
+  '/play': typeof AuthenticatedPlayRoute
   '/projects': typeof AuthenticatedProjectsRoute
   '/signal-desk': typeof AuthenticatedSignalDeskRoute
   '/studio': typeof AuthenticatedStudioRoute
@@ -160,6 +191,7 @@ export interface FileRoutesByTo {
   '/api/voice': typeof ApiVoiceRoute
   '/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
   '/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
+  '/api/oauth/github/return': typeof ApiOauthGithubReturnRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -172,8 +204,11 @@ export interface FileRoutesById {
   '/_authenticated/chat': typeof AuthenticatedChatRoute
   '/_authenticated/continuity': typeof AuthenticatedContinuityRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/decoupage': typeof AuthenticatedDecoupageRoute
   '/_authenticated/frame-control': typeof AuthenticatedFrameControlRoute
   '/_authenticated/memoire': typeof AuthenticatedMemoireRoute
+  '/_authenticated/parametres': typeof AuthenticatedParametresRoute
+  '/_authenticated/play': typeof AuthenticatedPlayRoute
   '/_authenticated/projects': typeof AuthenticatedProjectsRoute
   '/_authenticated/signal-desk': typeof AuthenticatedSignalDeskRoute
   '/_authenticated/studio': typeof AuthenticatedStudioRoute
@@ -181,6 +216,7 @@ export interface FileRoutesById {
   '/api/voice': typeof ApiVoiceRoute
   '/_authenticated/chat_/$threadId': typeof AuthenticatedChatThreadIdRoute
   '/_authenticated/projects_/$projectId': typeof AuthenticatedProjectsProjectIdRoute
+  '/api/oauth/github/return': typeof ApiOauthGithubReturnRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -193,8 +229,11 @@ export interface FileRouteTypes {
     | '/chat'
     | '/continuity'
     | '/dashboard'
+    | '/decoupage'
     | '/frame-control'
     | '/memoire'
+    | '/parametres'
+    | '/play'
     | '/projects'
     | '/signal-desk'
     | '/studio'
@@ -202,6 +241,7 @@ export interface FileRouteTypes {
     | '/api/voice'
     | '/chat/$threadId'
     | '/projects/$projectId'
+    | '/api/oauth/github/return'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -212,8 +252,11 @@ export interface FileRouteTypes {
     | '/chat'
     | '/continuity'
     | '/dashboard'
+    | '/decoupage'
     | '/frame-control'
     | '/memoire'
+    | '/parametres'
+    | '/play'
     | '/projects'
     | '/signal-desk'
     | '/studio'
@@ -221,6 +264,7 @@ export interface FileRouteTypes {
     | '/api/voice'
     | '/chat/$threadId'
     | '/projects/$projectId'
+    | '/api/oauth/github/return'
   id:
     | '__root__'
     | '/'
@@ -232,8 +276,11 @@ export interface FileRouteTypes {
     | '/_authenticated/chat'
     | '/_authenticated/continuity'
     | '/_authenticated/dashboard'
+    | '/_authenticated/decoupage'
     | '/_authenticated/frame-control'
     | '/_authenticated/memoire'
+    | '/_authenticated/parametres'
+    | '/_authenticated/play'
     | '/_authenticated/projects'
     | '/_authenticated/signal-desk'
     | '/_authenticated/studio'
@@ -241,6 +288,7 @@ export interface FileRouteTypes {
     | '/api/voice'
     | '/_authenticated/chat_/$threadId'
     | '/_authenticated/projects_/$projectId'
+    | '/api/oauth/github/return'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -249,6 +297,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ApiChatRoute: typeof ApiChatRoute
   ApiVoiceRoute: typeof ApiVoiceRoute
+  ApiOauthGithubReturnRoute: typeof ApiOauthGithubReturnRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -316,6 +365,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/decoupage': {
+      id: '/_authenticated/decoupage'
+      path: '/decoupage'
+      fullPath: '/decoupage'
+      preLoaderRoute: typeof AuthenticatedDecoupageRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/frame-control': {
       id: '/_authenticated/frame-control'
       path: '/frame-control'
@@ -328,6 +384,20 @@ declare module '@tanstack/react-router' {
       path: '/memoire'
       fullPath: '/memoire'
       preLoaderRoute: typeof AuthenticatedMemoireRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/parametres': {
+      id: '/_authenticated/parametres'
+      path: '/parametres'
+      fullPath: '/parametres'
+      preLoaderRoute: typeof AuthenticatedParametresRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/play': {
+      id: '/_authenticated/play'
+      path: '/play'
+      fullPath: '/play'
+      preLoaderRoute: typeof AuthenticatedPlayRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/projects': {
@@ -379,6 +449,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProjectsProjectIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/oauth/github/return': {
+      id: '/api/oauth/github/return'
+      path: '/api/oauth/github/return'
+      fullPath: '/api/oauth/github/return'
+      preLoaderRoute: typeof ApiOauthGithubReturnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -389,8 +466,11 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedChatRoute: typeof AuthenticatedChatRoute
   AuthenticatedContinuityRoute: typeof AuthenticatedContinuityRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDecoupageRoute: typeof AuthenticatedDecoupageRoute
   AuthenticatedFrameControlRoute: typeof AuthenticatedFrameControlRoute
   AuthenticatedMemoireRoute: typeof AuthenticatedMemoireRoute
+  AuthenticatedParametresRoute: typeof AuthenticatedParametresRoute
+  AuthenticatedPlayRoute: typeof AuthenticatedPlayRoute
   AuthenticatedProjectsRoute: typeof AuthenticatedProjectsRoute
   AuthenticatedSignalDeskRoute: typeof AuthenticatedSignalDeskRoute
   AuthenticatedStudioRoute: typeof AuthenticatedStudioRoute
@@ -405,8 +485,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedChatRoute: AuthenticatedChatRoute,
   AuthenticatedContinuityRoute: AuthenticatedContinuityRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDecoupageRoute: AuthenticatedDecoupageRoute,
   AuthenticatedFrameControlRoute: AuthenticatedFrameControlRoute,
   AuthenticatedMemoireRoute: AuthenticatedMemoireRoute,
+  AuthenticatedParametresRoute: AuthenticatedParametresRoute,
+  AuthenticatedPlayRoute: AuthenticatedPlayRoute,
   AuthenticatedProjectsRoute: AuthenticatedProjectsRoute,
   AuthenticatedSignalDeskRoute: AuthenticatedSignalDeskRoute,
   AuthenticatedStudioRoute: AuthenticatedStudioRoute,
@@ -423,6 +506,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ApiChatRoute: ApiChatRoute,
   ApiVoiceRoute: ApiVoiceRoute,
+  ApiOauthGithubReturnRoute: ApiOauthGithubReturnRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -29,6 +29,8 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
@@ -75,6 +77,8 @@
   --accent: oklch(0.62 0.19 255);
   --accent-foreground: oklch(0.99 0 0);
   --destructive: oklch(0.58 0.22 25);
+  --success: oklch(0.62 0.17 150);
+  --warning: oklch(0.75 0.16 70);
   --destructive-foreground: oklch(0.99 0 0);
   --border: oklch(0.91 0.004 260);
   --input: oklch(0.91 0.004 260);
@@ -114,6 +118,8 @@
   --accent: oklch(0.7 0.16 255);
   --accent-foreground: oklch(0.13 0.005 260);
   --destructive: oklch(0.65 0.2 25);
+  --success: oklch(0.72 0.17 150);
+  --warning: oklch(0.8 0.15 70);
   --destructive-foreground: oklch(0.99 0 0);
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 15%);
@@ -156,8 +162,9 @@
 .prose-mavai table { border-collapse: collapse; }
 .prose-mavai th, .prose-mavai td { border: 1px solid var(--border); padding: 0.25em 0.5em; }
 
-.voice-tracks { display: grid; gap: 4px; width: 100%; }
-.voice-track { display: grid; grid-template-columns: 56px minmax(0, 1fr); align-items: center; min-height: 40px; font-size: 12px; }
+.voice-composer { position: relative; margin-top: 20px; }
+.voice-composer [data-slot="input-group"] { border-top-color: transparent; border-left-color: var(--voice-assistant); border-right-color: var(--voice-human); box-shadow: none; }
+.voice-composer [data-slot="input-group"]:focus-within { box-shadow: none; }
+.voice-tracks { position: absolute; z-index: 1; top: -20px; left: 6px; right: 6px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); height: 40px; pointer-events: none; }
+.voice-track { min-width: 0; }
 .voice-track canvas { display: block; width: 100%; height: 40px; }
-.voice-track:first-child { color: var(--voice-assistant); }
-.voice-track:last-child { color: var(--voice-human); }

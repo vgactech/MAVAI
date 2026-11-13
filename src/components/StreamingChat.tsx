@@ -1,6 +1,8 @@
 // CERTIFIED_100=false | unique_human_proven=false | DEBUG
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport, type UIMessage, type FileUIPart } from 'ai';
+import type { MavaiUIMessage } from '@/lib/chat-steps';
+import { ReasoningPanel } from './ReasoningPanel';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useServerFn } from '@tanstack/react-start';
 import { supabase } from '@/integrations/supabase/client';
@@ -9,6 +11,8 @@ import { createConversation } from '@/lib/conversation.functions';
 import { speechChunks } from '@/lib/voice-text';
 import { VoiceSession, type VoicePhase } from './voice/voice-session';
 import { AudioTracks } from './voice/AudioTracks';
+import { ChatDiodes } from './ChatDiodes';
+import { AnswerAudio, CopyAnswer, SelectionBubble } from './AnswerTools';
 import { Button } from './ui/button';
 import { Switch } from './ui/switch';
 import { Mic, MicOff, Play, Square, Paperclip, X } from 'lucide-react';
@@ -31,14 +35,14 @@ async function voiceRequest(body: BodyInit, signal: AbortSignal, json = false) {
   if (!response.ok) { const result = await response.json().catch(()=>null); throw new Error(result?.error ?? `Service vocal [${response.status}] indisponible.`); }
   return response;
 }
-export function StreamingChat({id,initialMessages,onConversation}:{id:string|null;initialMessages:UIMessage[];onConversation:(id:string)=>void}) {
+export function StreamingChat({id,initialMessages,onConversation}:{id:string|null;initialMessages:MavaiUIMessage[];onConversation:(id:string)=>void}) {
   const owner = useRef(id);
   const projectId = useSelectedProject();
   const queryClient=useQueryClient();
   const sdkId=useRef(id ?? 'new-mavai');
   const create = useServerFn(createConversation);
   const saveStopped = useServerFn(saveStoppedAnswer);
-  const [captions,setCaptions] = useState<UIMessage[]>([]);
+  const [captions,setCaptions] = useState<MavaiUIMessage[]>([]);
   const [draft,setDraft] = useState('');
   const [files,setFiles] = useState<File[]>([]);
   const [voice,setVoice] = useState(false);
@@ -48,16 +52,18 @@ export function StreamingChat({id,initialMessages,onConversation}:{id:string|nul
   const controller = useRef<VoiceSession|null>(null);
   const audio = useRef<HTMLAudioElement|null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
+  const thread = useRef<HTMLDivElement>(null);
   const completion = useRef<{resolve:(m:UIMessage)=>void;reject:(e:Error)=>void}|null>(null);
-  const transport = useMemo(()=>new DefaultChatTransport({api:'/api/chat',headers:authHeaders,prepareSendMessagesRequest:({messages,...rest})=>({body:{...rest,conversationId:owner.current,messages}})}),[]);
-  const chat = useChat({id:sdkId.current,messages:initialMessages,transport,
+  const transport = useMemo(()=>new DefaultChatTransport({api:'/api/chat',headers:authHeaders,// History is reloaded from the database on the server; only the newest user turn travels.
+    prepareSendMessagesRequest:({messages,...rest})=>({body:{...rest,conversationId:owner.current,messages:messages.slice(-1)}})}),[]);
+  const chat = useChat<MavaiUIMessage>({id:sdkId.current,messages:initialMessages,transport,
     onError:e=>{completion.current?.reject(e);completion.current=null;},
     onFinish:({message,isAbort,isError})=>{
       if (isAbort && owner.current && textOf(message)) void saveStopped({data:{conversationId:owner.current,id:message.id,content:textOf(message)}}).catch(e=>toast.error(e.message));
       if (isAbort || isError) completion.current?.reject(new Error(isAbort?'Réponse arrêtée.':'La génération a échoué.'));
       else completion.current?.resolve(message);
       completion.current=null;
-      void queryClient.invalidateQueries({queryKey:['project-conversations',projectId]});
+      void queryClient.invalidateQueries({queryKey:['project-conversations']});
     },
   });
   const current = useRef({chat,create,onConversation}); current.current={chat,create,onConversation};
@@ -123,12 +129,19 @@ export function StreamingChat({id,initialMessages,onConversation}:{id:string|nul
   const phases={idle:'Au repos',listening:'Micro actif',generating:'Génération en cours',speaking:'MAVAI parle','playback-blocked':'Lecture à autoriser',error:'En pause'};
   const visible=[...chat.messages,...captions.filter(m=>!chat.messages.some(x=>x.id===m.id))];
   return <>
-    <Conversation className="min-h-0 flex-1"><ConversationContent className="mx-auto w-full max-w-3xl">
+    <SelectionBubble container={thread}/>
+    <div ref={thread} className="flex min-h-0 flex-1 flex-col"><Conversation className="min-h-0 flex-1"><ConversationContent className="mx-auto w-full max-w-3xl">
       {!visible.length && <div className="flex flex-col items-center gap-4 py-12 text-center"><MavaiMark className="size-12"/><h1 className="text-xl font-semibold">Bonjour, Gabriel. Que préparons-nous ?</h1></div>}
-      {visible.map(m=><Message key={m.id} from={m.role}><MessageContent>{m.parts.map((p,i)=>p.type==='text'?<MessageResponse key={i}>{p.text}</MessageResponse>:p.type==='file'&&p.mediaType.startsWith('image/')?<img key={i} src={p.url} alt="Image jointe" className="max-h-60 max-w-full rounded-md"/>:p.type==='source-url'?<a key={i} href={p.url} target="_blank" rel="noreferrer" className="text-sm underline">{p.title ?? p.url}</a>:null)}</MessageContent>{m.role==='assistant'&&Boolean(m.metadata)&&<p className="text-xs text-muted-foreground">{String((m.metadata as Record<string,unknown>)["model"] ?? 'Modèle non communiqué')} · {typeof (m.metadata as Record<string,unknown>)["tokens"]==='number'?`${(m.metadata as Record<string,unknown>)["tokens"]} tokens`:'Tokens non communiqués'} · {typeof (m.metadata as Record<string,unknown>)["memoryCount"]==='number'?`${(m.metadata as Record<string,unknown>)["memoryCount"]} mémoires`:'Mémoires non communiquées'}{(m.metadata as Record<string,unknown>)["stopped"]?' · Arrêtée':''}</p>}</Message>)}
-      {chat.status==='submitted'&&<p role="status" className="text-sm text-muted-foreground">MAVAI prépare sa réponse…</p>}
-    </ConversationContent><ConversationScrollButton/></Conversation>
+      {visible.map((m,index)=>{const live=m.role==='assistant'&&index===visible.length-1&&(chat.status==='streaming'||chat.status==='submitted');const meta=(m.metadata ?? null) as Record<string,unknown>|null;
+        return <Message key={m.id} from={m.role}><MessageContent className="group-[.is-assistant]:w-full">
+          {m.role==='assistant'&&<ReasoningPanel parts={m.parts} live={live}/>}
+          {m.parts.map((p,i)=>p.type==='text'?<MessageResponse key={i}>{p.text}</MessageResponse>:p.type==='file'&&p.mediaType.startsWith('image/')?<img key={i} src={p.url} alt="Image jointe" className="max-h-60 max-w-full rounded-md"/>:p.type==='source-url'?<a key={i} href={p.url} target="_blank" rel="noreferrer" className="text-sm underline">{p.title ?? p.url}</a>:null)}
+        {m.role==='assistant'&&!live&&textOf(m)&&<AnswerAudio key={`a-${m.id}`} text={textOf(m)}/>}
+        </MessageContent>{m.role==='assistant'&&!live&&textOf(m)&&<div className="-mt-1 flex"><CopyAnswer text={textOf(m)}/></div>}{m.role==='assistant'&&meta&&!live&&<p className="text-xs text-muted-foreground">{String(meta["model"] ?? 'Modèle non communiqué')} · {typeof meta["tokens"]==='number'?`${meta["tokens"]} tokens`:'Tokens non communiqués'} · {typeof meta["memoryCount"]==='number'?`${meta["memoryCount"]} mémoires`:'Mémoires non communiquées'}{meta["stopped"]?' · Arrêtée':''}</p>}</Message>;})}
+      {chat.status==='submitted'&&visible.at(-1)?.role!=='assistant'&&<Message from="assistant"><MessageContent className="group-[.is-assistant]:w-full"><ReasoningPanel parts={[]} live/></MessageContent></Message>}
+    </ConversationContent><ConversationScrollButton/></Conversation></div>
     <footer className="border-t border-border px-3 py-2"><div className="mx-auto max-w-3xl space-y-2">
+      <ChatDiodes running={busy||chat.status==='streaming'||chat.status==='submitted'} failed={chat.status==='error'||state.phase==='error'}/>
       <div className="flex flex-wrap items-center gap-2">
         {microphone&&<Button type="button" size="icon-sm" variant="ghost" aria-label={state.muted?'Réactiver le micro':'Couper le micro'} onClick={()=>controller.current?.mute(!state.muted)}>{state.muted?<MicOff className="size-4"/>:<Mic className="size-4"/>}</Button>}
         {(microphone||busy)&&<Button type="button" size="icon-sm" variant="destructive" aria-label="Arrêter la session" onClick={stop}><Square className="size-4"/></Button>}
@@ -137,13 +150,13 @@ export function StreamingChat({id,initialMessages,onConversation}:{id:string|nul
         {state.phase==='error'&&<Button type="button" size="sm" variant="outline" onClick={()=>controller.current?.resumePending()}>Continuer la file</Button>}
       </div>
       {files.length>0&&<div className="flex flex-wrap gap-2">{files.map((f,i)=><div key={i} className="flex items-center text-xs"><span className="max-w-40 truncate">{f.name}</span><Button size="icon-xs" variant="ghost" aria-label={`Retirer ${f.name}`} onClick={()=>setFiles(p=>p.filter((_,j)=>i!==j))}><X className="size-3"/></Button></div>)}</div>}
-      <PromptInput onSubmit={()=>void submit()}>{microphone&&<div className="px-3 pt-2"><AudioTracks assistant={nodes?.assistant ?? null} human={nodes?.human ?? null}/></div>}<PromptInputTextarea aria-label="Message" placeholder="Écrivez à MAVAI…" value={draft} onChange={e=>setDraft(e.target.value)}/><PromptInputFooter>
+      <div className={microphone || voice ? 'voice-composer' : ''}>{(microphone || voice)&&<AudioTracks assistant={nodes?.assistant ?? null} human={nodes?.human ?? null}/>}<PromptInput onSubmit={()=>void submit()}><PromptInputTextarea aria-label="Message" placeholder="Écrivez à MAVAI…" value={draft} onChange={e=>setDraft(e.target.value)}/><PromptInputFooter>
         <input ref={fileInput} type="file" accept="image/png,image/jpeg,image/webp" hidden multiple onChange={e=>{const incoming=Array.from(e.target.files ?? []);if(incoming.some(f=>f.size>8*1024*1024))toast.error('Image trop lourde (8 Mo maximum).');else setFiles(p=>[...p,...incoming].slice(0,5));e.target.value='';}}/>
         <Button type="button" size="icon-sm" variant="ghost" aria-label="Joindre une image" onClick={()=>fileInput.current?.click()}><Paperclip className="size-4"/></Button>
         <label className="flex items-center gap-2 text-xs text-muted-foreground"><Switch checked={voice} onCheckedChange={setVoice} aria-label="Réponse vocale"/>Réponse vocale</label><div className="flex-1"/>
         <Button type="button" size="icon-sm" variant={microphone?'secondary':'ghost'} aria-label="Activer le vocal" disabled={microphone} onClick={()=>void startMicrophone()}><Mic className="size-4"/></Button>
         <PromptInputSubmit aria-label="Envoyer" disabled={!draft.trim()&&!files.length} />
-      </PromptInputFooter></PromptInput>
+      </PromptInputFooter></PromptInput></div>
     </div></footer>
   </>;
 }

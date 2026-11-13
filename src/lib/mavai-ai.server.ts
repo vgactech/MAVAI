@@ -1,5 +1,6 @@
 // Server-only: MAVAI AI calls (Lovable AI for text, ElevenLabs for voice in/out).
 import { audioExtension, speechChunks } from './voice-text';
+import { ANSWER_INSTRUCTIONS } from './answer-policy';
 const GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const MODEL = "google/gemini-3-flash-preview";
 
@@ -7,7 +8,7 @@ const SYSTEM =
   "Tu es MAVAI (Mémoire Artificielle Visuelle & IA), l'intelligence centrale de l'écosystème ARTcB. " +
   "Tu es précis, chaleureux et professionnel. Tu réponds dans la langue de l'utilisateur (français par défaut). " +
   "Réponses complètes, claires et structurées ; en mode vocal, conserve tous les détails utiles avec une formulation naturelle. " +
-  "Quand un contenu extrait d'un document est incertain, indique « À vérifier ».";
+  "Quand un contenu extrait d'un document est incertain, indique « À vérifier ». " + ANSWER_INSTRUCTIONS;
 
 export type HistoryItem = { role: "user" | "assistant"; content: string };
 export type ImageInput = { type: string; dataBase64: string };

@@ -14,8 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_user_connections: {
+        Row: {
+          connection_key_ciphertext: string
+          connector_id: string
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          connection_key_ciphertext: string
+          connector_id: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          connection_key_ciphertext?: string
+          connector_id?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       conversations: {
         Row: {
+          archived_at: string | null
           created_at: string
           id: string
           project_id: string | null
@@ -24,6 +52,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          archived_at?: string | null
           created_at?: string
           id?: string
           project_id?: string | null
@@ -32,6 +61,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          archived_at?: string | null
           created_at?: string
           id?: string
           project_id?: string | null
@@ -48,6 +78,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      github_memory_repos: {
+        Row: {
+          created_at: string
+          github_login: string
+          last_error: string | null
+          last_synced_at: string | null
+          owner_marker: string
+          repo_full_name: string
+          repo_id: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          github_login: string
+          last_error?: string | null
+          last_synced_at?: string | null
+          owner_marker?: string
+          repo_full_name: string
+          repo_id: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          github_login?: string
+          last_error?: string | null
+          last_synced_at?: string | null
+          owner_marker?: string
+          repo_full_name?: string
+          repo_id?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       memories: {
         Row: {
@@ -169,11 +235,104 @@ export type Database = {
           },
         ]
       }
+      production_node_versions: {
+        Row: {
+          content: string
+          created_at: string
+          data: Json
+          id: string
+          node_id: string
+          note: string
+          title: string
+          user_id: string
+          version: number
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          data?: Json
+          id?: string
+          node_id: string
+          note?: string
+          title: string
+          user_id: string
+          version: number
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          data?: Json
+          id?: string
+          node_id?: string
+          note?: string
+          title?: string
+          user_id?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "production_node_versions_node_id_fkey"
+            columns: ["node_id"]
+            isOneToOne: false
+            referencedRelation: "production_nodes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      production_nodes: {
+        Row: {
+          archived_at: string | null
+          created_at: string
+          id: string
+          kind: string
+          parent_id: string | null
+          position: number
+          project_id: string
+          user_id: string
+        }
+        Insert: {
+          archived_at?: string | null
+          created_at?: string
+          id?: string
+          kind: string
+          parent_id?: string | null
+          position?: number
+          project_id: string
+          user_id: string
+        }
+        Update: {
+          archived_at?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          parent_id?: string | null
+          position?: number
+          project_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "production_nodes_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "production_nodes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "production_nodes_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "production_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       production_projects: {
         Row: {
           created_at: string
           description: string
           id: string
+          target_duration_seconds: number | null
           title: string
           updated_at: string
           user_id: string
@@ -182,6 +341,7 @@ export type Database = {
           created_at?: string
           description?: string
           id?: string
+          target_duration_seconds?: number | null
           title: string
           updated_at?: string
           user_id: string
@@ -190,9 +350,43 @@ export type Database = {
           created_at?: string
           description?: string
           id?: string
+          target_duration_seconds?: number | null
           title?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_api_credentials: {
+        Row: {
+          created_at: string
+          id: string
+          key_ciphertext: string
+          key_hint: string
+          provider: string
+          updated_at: string
+          user_id: string
+          verified_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key_ciphertext: string
+          key_hint: string
+          provider: string
+          updated_at?: string
+          user_id: string
+          verified_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key_ciphertext?: string
+          key_hint?: string
+          provider?: string
+          updated_at?: string
+          user_id?: string
+          verified_at?: string | null
         }
         Relationships: []
       }
