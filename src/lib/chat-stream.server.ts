@@ -32,7 +32,7 @@ export async function handleChatStream(request: Request) {
   const latestParsed = body.success ? userMessageSchema.safeParse(body.data.messages.at(-1)) : null;
   if (!body.success || !latestParsed?.success) return Response.json({ error: "Message invalide." }, { status: 400 });
   const { conversationId } = body.data; const latest = latestParsed.data as MavaiUIMessage;
-  const { data: conversation } = await sb.from("conversations").select("id,project_id,title").eq("id", conversationId).eq("user_id", userId).single();
+  const { data: conversation } = await sb.from("conversations").select("id,project_id,title,linked_conversation_ids").eq("id", conversationId).eq("user_id", userId).single();
   if (!conversation) return Response.json({ error: "Conversation introuvable." }, { status: 404 });
   const text = latest.parts.filter(p => p.type === "text").map(p => p.text).join("\n");
   const { data: existing } = await sb.from("messages").select("id").eq("conversation_id", conversationId).eq("client_message_id", latest.id).maybeSingle();
@@ -49,10 +49,21 @@ export async function handleChatStream(request: Request) {
     return { id: m.client_message_id ?? m.id, role: m.role as "user" | "assistant", parts: parts.length ? parts : [{ type: "text", text: m.content }] };
   });
 
+  // Linked chats (any project of the same owner) give this chat full read access to their history.
+  let linkedMemory = ""; let linkedCount = 0;
+  const linkedIds = (conversation.linked_conversation_ids ?? []).filter(x => x !== conversationId);
+  if (linkedIds.length) {
+    const [{ data: convs }, { data: rows }] = await Promise.all([
+      sb.from("conversations").select("id,title").eq("user_id", userId).in("id", linkedIds),
+      sb.from("messages").select("conversation_id,role,content").eq("user_id", userId).in("conversation_id", linkedIds).order("created_at"),
+    ]);
+    linkedCount = convs?.length ?? 0;
+    linkedMemory = (convs ?? []).map(c => `### Chat lié « ${c.title} »\n` + (rows ?? []).filter(r => r.conversation_id === c.id).map(r => `${r.role === "user" ? "Utilisateur" : "MAVAI"}: ${r.content}`).join("\n")).join("\n\n").slice(-200000);
+  }
   const provider = createLovableAiGatewayRunIdFetch();
   const assistantId = crypto.randomUUID();
   const started = Date.now();
-  let memoryCount = 0; let artcbStored = false; let systemPrompt = "";
+  let memoryCount = 0; let finalProvider = "Lovable AI"; let artcbStored = false; let systemPrompt = "";
   const stream = createUIMessageStream<MavaiUIMessage>({
     originalMessages: [latest],
     generateId: () => assistantId,
@@ -61,16 +72,17 @@ export async function handleChatStream(request: Request) {
       writer.write({ type: "start", messageId: assistantId, messageMetadata: { provider: "Lovable AI", startedAt: new Date(started).toISOString(), stage: "preparation" } });
       step("context", { label: "Message enregistré", detail: `${contextMessages.length} message${contextMessages.length > 1 ? "s" : ""} de la conversation relus`, status: "done" });
       step("memory", { label: "Lecture de la mémoire du projet…", status: "running" });
-      const { data: memory, error: memoryError } = await sb.from("memories").select("content").eq("user_id", userId).filter("project_id", conversation.project_id ? "eq" : "is", conversation.project_id ?? null).limit(50);
+      const { data: memory, error: memoryError } = await sb.from("memories").select("content").eq("user_id", userId).or(conversation.project_id ? `project_id.eq.${conversation.project_id},project_id.is.null` : "project_id.is.null").order("created_at", { ascending: false }).limit(50);
       memoryCount = memory?.length ?? 0;
-      step("memory", memoryError ? { label: "Mémoire indisponible", detail: "Réponse préparée sans la mémoire du projet", status: "error" } : { label: "Mémoire du projet consultée", detail: memoryCount ? `${memoryCount} élément${memoryCount > 1 ? "s" : ""} retenu${memoryCount > 1 ? "s" : ""}` : "Aucun élément enregistré pour ce projet", status: "done" });
+      step("memory", memoryError ? { label: "Mémoire indisponible", detail: "Réponse préparée sans la mémoire du projet", status: "error" } : { label: "Mémoire du projet consultée", detail: memoryCount ? `${memoryCount} élément${memoryCount > 1 ? "s" : ""} retenu${memoryCount > 1 ? "s" : ""}` : "Aucune mémoire enregistrée (projet ou générale)", status: "done" });
+      if (linkedCount) step("linked", { label: "Chats liés relus", detail: `${linkedCount} chat${linkedCount > 1 ? "s" : ""} lié${linkedCount > 1 ? "s" : ""} en mémoire complète`, status: "done" });
       step("artcb", { label: "Consultation d’ARTcB…", status: "running" });
       const { callARTcB } = await import("./artcb.server");
       const artcb = await callARTcB(text, userId, conversationId, request.signal);
       artcbStored = artcb?.stored ?? false;
       step("artcb", artcb ? { label: artcbStored ? "Raisonnement enregistré dans ARTcB" : "ARTcB a répondu", detail: artcb.encoded ? "Accusé d’encodage reçu" : undefined, status: "done" } : { label: "ARTcB non joignable", detail: "MAVAI répond sans ARTcB", status: "skipped" });
       if (request.signal.aborted) return;
-      const system = systemPrompt = `Tu es MAVAI, assistant de production audiovisuelle. Date UTC: ${new Date().toISOString()}. Recherche sur Google toute actualité et cite des liens sans prétendre qu’ils sont vérifiés. Mémoire utilisateur: ${(memory ?? []).map(m => m.content).join("\n")}. Préserve le contrôle artistique humain. Tu ne peux pas inspecter ni modifier ton code source, déployer, gérer les secrets ou contacter des services sans outil explicite. Tu peux analyser les images jointes, répondre, rechercher et préparer des propositions. Ne prétends jamais avoir exécuté une action sans résultat d’outil. Les modèles, tokens et mémoires doivent être ceux réellement communiqués, jamais inventés. ${ANSWER_INSTRUCTIONS} En production, chaque élément (plan, prise, image, personnage, décor, voix, réplique, musique, bruitage, sous-titre, couleur, effet, version) reste séparé et versionné avant et après assemblage : l’assemblage ne fait que référencer les éléments, pour que toute correction se fasse au détail près sans perte.`;
+      const system = systemPrompt = `Tu es MAVAI, assistant de production audiovisuelle. Date UTC: ${new Date().toISOString()}. Recherche sur Google toute actualité et cite des liens sans prétendre qu’ils sont vérifiés. Mémoire utilisateur: ${(memory ?? []).map(m => m.content).join("\n")}.${linkedMemory ? ` Historique complet des chats liés par l’utilisateur (lecture seule, à utiliser comme mémoire) :\n${linkedMemory}\n` : ""} Préserve le contrôle artistique humain. Tu ne peux pas inspecter ni modifier ton code source, déployer, gérer les secrets ou contacter des services sans outil explicite. Tu peux analyser les images jointes, répondre, rechercher et préparer des propositions. Ne prétends jamais avoir exécuté une action sans résultat d’outil. Les modèles, tokens et mémoires doivent être ceux réellement communiqués, jamais inventés. ${ANSWER_INSTRUCTIONS} En production, chaque élément (plan, prise, image, personnage, décor, voix, réplique, musique, bruitage, sous-titre, couleur, effet, version) reste séparé et versionné avant et après assemblage : l’assemblage ne fait que référencer les éléments, pour que toute correction se fasse au détail près sans perte.`;
       const modelMessages = await convertToModelMessages(contextMessages);
       const { createOpenAICompatible } = await import("@ai-sdk/openai-compatible");
       // Streams one model; parts are buffered until the first real output so a provider that fails up-front can be replaced silently.
@@ -98,7 +110,7 @@ export async function handleChatStream(request: Request) {
       let outcome: Awaited<ReturnType<typeof run>> | null = null;
       if (own) {
         step("generation", { label: `Rédaction avec votre compte ${own.name}…`, detail: own.model, status: "running" });
-        const ownProvider = createOpenAICompatible({ name: own.provider, baseURL: own.baseURL, apiKey: own.apiKey });
+        const ownProvider = createOpenAICompatible({ name: own.provider, baseURL: own.baseURL, apiKey: own.apiKey, includeUsage: true });
         outcome = await run(ownProvider.chatModel(own.model));
         if (outcome.emitted) providerName = own.name;
         else if (outcome.failed) { step("provider", { label: "Votre compte externe n'a pas pu répondre", detail: explainProviderError(own.name, outcome.errorText), status: "error" }); outcome = null; }
@@ -106,7 +118,7 @@ export async function handleChatStream(request: Request) {
       if (!outcome && !request.signal.aborted) {
         step("generation", { label: "Recherche web et rédaction de la réponse…", detail: "Lovable AI", status: "running" });
         // Inject built-in search after SDK serialization; preserve run correlation and cancellation.
-        const searchProvider = createOpenAICompatible({ name: "lovable", baseURL: "https://ai.gateway.lovable.dev/v1", headers: { "Lovable-API-Key": aiKey, "X-Lovable-AIG-SDK": "vercel-ai-sdk" }, fetch: async (input, init) => { const requestBody = JSON.parse(String(init?.body)); requestBody.tools = [{ type: "google_search" }]; return provider.fetch(input, { ...init, body: JSON.stringify(requestBody) }); } });
+        const searchProvider = createOpenAICompatible({ name: "lovable", includeUsage: true, baseURL: "https://ai.gateway.lovable.dev/v1", headers: { "Lovable-API-Key": aiKey, "X-Lovable-AIG-SDK": "vercel-ai-sdk" }, fetch: async (input, init) => { const requestBody = JSON.parse(String(init?.body)); requestBody.tools = [{ type: "google_search" }]; return provider.fetch(input, { ...init, body: JSON.stringify(requestBody) }); } });
         outcome = await run(searchProvider.chatModel(MODEL), { maxRetries: 2, providerOptions: { lovable: { reasoningEffort: "medium" } } });
       }
       if (!outcome) return;
@@ -114,9 +126,9 @@ export async function handleChatStream(request: Request) {
       if (failed && !outcome.emitted) writer.write({ type: "error", errorText: outcome.errorText || "Le service IA a interrompu la réponse." });
       if (request.signal.aborted) return;
       let usage: number | null = null; let modelId: string | null = MODEL;
-      try { usage = (await result.totalUsage).totalTokens ?? null; modelId = (await result.response).modelId ?? MODEL; } catch { failed = true; }
+      try { const u = await result.totalUsage; usage = u.totalTokens ?? ((u.inputTokens ?? 0) + (u.outputTokens ?? 0) || null); modelId = (await result.response).modelId ?? MODEL; } catch { failed = true; }
       step("generation", failed ? { label: "Génération interrompue", detail: "Le service IA n’a pas terminé la réponse", status: "error" } : { label: "Réponse rédigée", detail: [modelId, usage !== null ? `${usage} tokens` : null, `${((Date.now() - started) / 1000).toFixed(1)} s`, reasoned ? null : "réponse directe, sans réflexion détaillée du modèle"].filter(Boolean).join(" · "), status: "done" });
-      writer.write({ type: "finish", finishReason: failed ? "error" : "stop", messageMetadata: { provider: providerName, model: modelId, tokens: usage, memoryCount, artcbStored, durationMs: Date.now() - started, stage: "completed" } });
+      writer.write({ type: "finish", finishReason: failed ? "error" : "stop", messageMetadata: { provider: (finalProvider = providerName), model: modelId, tokens: usage, memoryCount, artcbStored, durationMs: Date.now() - started, stage: "completed" } });
     },
     onError: error => error instanceof Error ? error.message : "Le service IA a interrompu la réponse.",
     onEnd: async ({ responseMessage, isAborted }) => {
@@ -125,7 +137,7 @@ export async function handleChatStream(request: Request) {
         const answer = responseMessage.parts.filter(p => p.type === "text").map(p => p.text).join("");
         if (!answer) throw new Error("Aucune réponse générée.");
         const meta = (responseMessage.metadata ?? {}) as Record<string, unknown>;
-        const metadata = { provider: "Lovable AI", model: (meta["model"] as string | undefined) ?? MODEL, tokens: (meta["tokens"] as number | null | undefined) ?? null, memoryCount, artcbStored, durationMs: Date.now() - started, parts: responseMessage.parts as unknown as Json };
+        const metadata = { provider: finalProvider, model: (meta["model"] as string | undefined) ?? MODEL, tokens: (meta["tokens"] as number | null | undefined) ?? null, memoryCount, artcbStored, durationMs: Date.now() - started, parts: responseMessage.parts as unknown as Json };
         const { error } = await sb.from("messages").insert({ conversation_id: conversationId, user_id: userId, role: "assistant", content: answer, client_message_id: responseMessage.id, metadata });
         if (error) throw new Error(`Réponse non enregistrée (${error.code}).`);
         const { error: update } = await sb.from("conversations").update({ updated_at: new Date().toISOString() }).eq("id", conversationId).eq("user_id", userId);

@@ -77,6 +77,28 @@ export const updateConversation = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/** Full-memory links: the chat reads the complete history of other owned chats (any project). */
+export const getLinkedConversations = createServerFn({ method: "GET" }).middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ context, data }) => {
+    const { data: row, error } = await context.supabase.from("conversations").select("linked_conversation_ids").eq("id", data.id).eq("user_id", context.userId).single();
+    if (error || !row) throw new Error("Chat inaccessible.");
+    return row.linked_conversation_ids ?? [];
+  });
+
+export const setLinkedConversations = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid(), linkedIds: z.array(z.string().uuid()).max(20) }).parse(d))
+  .handler(async ({ context, data }) => {
+    const ids = [...new Set(data.linkedIds.filter(x => x !== data.id))];
+    if (ids.length) {
+      const { data: owned, error } = await context.supabase.from("conversations").select("id").eq("user_id", context.userId).in("id", ids);
+      if (error || (owned ?? []).length !== ids.length) throw new Error("Un des chats choisis ne vous appartient pas.");
+    }
+    const { error } = await context.supabase.from("conversations").update({ linked_conversation_ids: ids }).eq("id", data.id).eq("user_id", context.userId);
+    if (error) throw new Error("Liaison impossible.");
+    return { ok: true, count: ids.length };
+  });
+
 export const listMemories = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d:unknown)=>z.object({projectId:z.string().uuid().optional()}).parse(d??{}))

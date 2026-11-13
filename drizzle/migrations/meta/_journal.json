@@ -57,6 +57,13 @@
       "when": 1794605155176,
       "tag": "0007_production_tree",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1794608594509,
+      "tag": "0008_conversation_linked_memory",
+      "breakpoints": true
     }
   ]
 }

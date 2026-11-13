@@ -52,3 +52,4 @@ use the editor.
 - Project and conversation rename actions share a dialog and owner-scoped update functions; titles change without replacing records or message history.
 - Shared answer instructions govern both streaming and legacy chat; personal display rules must not become mandatory for all users.
 - Audio wave canvases overlay only the composer top border and read the existing analyser nodes; the fixed sides and bottom never animate.
+- Chat full-memory links: conversations.linked_conversation_ids lists other owned chats (any project) whose full history /api/chat reads as read-only context; owner checked on save and read.

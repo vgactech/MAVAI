@@ -46,6 +46,7 @@ export type Database = {
           archived_at: string | null
           created_at: string
           id: string
+          linked_conversation_ids: string[]
           project_id: string | null
           title: string
           updated_at: string
@@ -55,6 +56,7 @@ export type Database = {
           archived_at?: string | null
           created_at?: string
           id?: string
+          linked_conversation_ids?: string[]
           project_id?: string | null
           title?: string
           updated_at?: string
@@ -64,6 +66,7 @@ export type Database = {
           archived_at?: string | null
           created_at?: string
           id?: string
+          linked_conversation_ids?: string[]
           project_id?: string | null
           title?: string
           updated_at?: string
