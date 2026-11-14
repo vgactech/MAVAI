@@ -1,0 +1,16 @@
+﻿Service;Variable côté serveur;Opération;HTTP;État;Preuve et limite;Action suivante
+OpenAI;OPENAI_API_KEY_2;GET /v1/models + POST /v1/chat/completions;200 / 200;Texte gpt-5.4 vérifié;"28 tokens ; réponse attendue OK";"Configurer dans le clone ; streaming/outils/vision restent à tester"
+OpenAI ancien;OPENAI_API_KEY;GET /v1/models;401;Refusé;Authentification ou permission refusée;Ne pas utiliser cette entrée pour le nouveau déploiement
+OpenAI autre entrée;OPENAI_API_KEY2;GET /v1/models;200;Catalogue seulement;Authentification GET confirmée;Conserver le nom distinct de OPENAI_API_KEY_2
+Mistral;MISTRAL_API_KEY;GET /v1/models + POST /v1/chat/completions;200 / 403;Génération bloquée;"mistral-large-latest ; max 32 tokens ; aucun retry";Vérifier accès et autorisation de génération
+Featherless;FEATHERLESS_AI_API;GET /v1/plan + POST /v1/chat/completions;200 / 200;Texte vérifié;"Qwen/Qwen3-VL-4B-Instruct ; 12 tokens ; coût annoncé 0.0000056 USD";Tester streaming/outils/vision séparément
+Hémicycle;HEMICYCLE_AI_API;MCP initialize, tools/list et tools/call lister_jeux;200;Lecture MCP vérifiée;"18 outils ; lister_jeux non vide ; appel documenté gratuit";Tester les outils métier choisis et leur coût
+ElevenLabs nouvelle;MAVAI_DR_MANATHAN;GET /v1/user + POST /v1/text-to-speech;200 / 401;TTS bloqué;"Texte Oui chef. ; scribe STT non atteint";"Diagnostiquer accès/scope/voix ; cause exacte non établie"
+ElevenLabs actuelle;ELEVENLABS_API_KEY;GET /v1/user;200;Compte accessible;Générations voix non testées sur cette entrée;"Préserver clé actuelle ; tester STT/TTS dans clone"
+Higgsfield;HIGGSFIELD_AI_API vers HF_CREDENTIALS;SDK v2 subscribe Seedance 2.5;403;Génération bloquée;"Une tentative ; NotEnoughCreditsError SDK ; aucune URL vidéo";Corriger crédits/accès modèle puis relancer une seule fois
+Oriane;ORIANE_XYZ_API_2;"Docs publiques ; aucun appel authentifié";200 docs;Contrat auth manquant;OpenAPI sans securitySchemes;Obtenir documentation exacte avant test
+Supabase;SUPABASE_URL + PUBLISHABLE_KEY_SUPABASE;GET /auth/v1/health;aucun statut;Non vérifié;"Échec transport/client ; valeurs non affichées";Vérifier URL, réseau et correspondance clé/projet puis mapping
+ARTcB;ARTCB_API_URL / ARTCB_API_KEY;Validation URL avant /health;non appelé;Configuration à corriger;URL ne passe pas validation HTTPS du probe;Vérifier URL serveur HTTPS et retester
+Lovable AI;LOVABLE_API_KEY;Runtime du clone;non testé;À configurer/vérifier;"Nom absent dans lvx inspecté ; état Lovable distinct";Vérifier injection Lovable Cloud et capacité réelle
+GitHub audit;connexion plugin GitHub;Lecture dépôts MAVAI et bnb;200;Accès dépôt vérifié;Connexion de la mémoire applicative distincte;Reconfigurer mémoire GitHub personnelle du clone
+Claude / Gemini / Perplexity / Replicate;connexions utilisateur;Fournisseurs présents dans le code;non testé;À tester dans le clone;Aucune certification de leurs capacités;Valider les credentials et modèles réellement retenus

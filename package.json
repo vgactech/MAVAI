@@ -11,7 +11,10 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "higgsfield:example": "bun run examples/higgsfield/index.ts",
+    "higgsfield:check": "tsc --project examples/higgsfield/tsconfig.json",
+    "higgsfield:test": "vitest run --config examples/higgsfield/vitest.config.ts"
   },
   "overrides": {
     "rolldown": "1.2.1"
@@ -19,6 +22,7 @@
   "dependencies": {
     "@ai-sdk/openai-compatible": "^3.0.85",
     "@ai-sdk/react": "^4.0.167",
+    "@higgsfield/client": "^0.2.6",
     "@hookform/resolvers": "^5.2.2",
     "@lovable.dev/cloud-auth-js": "^1.1.2",
     "@radix-ui/react-accordion": "^1.2.12",

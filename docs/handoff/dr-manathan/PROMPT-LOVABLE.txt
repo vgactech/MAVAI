@@ -1,0 +1,98 @@
+MISSION LOVABLE — REMIX MAVAI ET AJOUT DU MODE DR MANATHAN
+
+Expertises à mobiliser : architecture TypeScript/React, TanStack Start, Lovable Cloud/Supabase, API IA et MCP, assistants vocaux, sécurité applicative, données publiques et simulation financière. Pour mon compte personnel, afficher les expertises réellement utiles dans chaque réponse et garder un regard critique. Ne pas imposer ma préférence aux autres utilisateurs.
+
+Objectif : créer une nouvelle instance MAVAI proposant, en plus des fonctions audiovisuelles actuelles, un assistant généraliste nommé « DR MANATHAN ». Il doit traiter texte, voix, recherche, documents, analyse de données, rédaction et outils autorisés. Préparer une démonstration Open Data pour le hackathon swanbase/Hémicycle/Featherless du 14 novembre 2026. Implémenter réellement les fonctionnalités par étapes ; annoncer uniquement les actions dont un résultat technique confirme l'exécution.
+
+SOURCE ET PRÉSERVATION
+
+Remixer ce projet dans un nouvel environnement :
+https://lovable.dev/projects/52e102a1-1fed-4dca-9640-6b1406da9cd2
+Dépôt source : https://github.com/vgactech/MAVAI.git
+Base auditée : d82ccc8091a40cbc57f67cb85a292f21928cbef1.
+
+Le Remix constitue le chemin principal. Il recopie code, structure de base, fonctions et noms des secrets ; il ne recopie pas leurs valeurs, les données, utilisateurs, connexions GitHub ni la publication. Reconfigurer ces éléments dans le clone. Connecter ensuite le nouveau projet à un nouveau dépôt GitHub. Si Remix est indisponible, utiliser l'import ZIP de code selon les limites documentées et reconstituer les services manquants ; ne pas prétendre qu'un simple git clone copie le backend Lovable.
+
+Conserver intact le projet source, son environnement, ses données et son historique. Lire AGENTS.md avant toute modification : aucun force push ni réécriture d'historique ; migrations et fichiers générés gérés par Lovable ; gateway IA existant conservé ; clés exclusivement serveur. Utiliser TypeScript et Bun, le bun.lock et le garde-fou minimumReleaseAge existants. Ne pas réinstaller les plugins déjà inclus par @lovable.dev/vite-tanstack-config.
+
+Le livrable de cette mission contient un ajout isolé examples/higgsfield et les changements package.json/bun.lock correspondants. Réappliquer ces seuls ajouts au remix ; ne pas supposer qu'ils sont déjà publiés dans le dépôt source. Ne jamais importer de fichier .env, token Doppler, journal contenant des credentials, node_modules ou ancien fichier de session.
+
+ÉTAT INITIAL VÉRIFIÉ
+
+MAVAI a déjà un chat multi-provider, streaming, mémoire personnelle/projet, chats liés, GitHub privé par propriétaire, ARTcB, voix ElevenLabs, ressources de production versionnées, personnages, continuité, storyboard/découpage, images, musique, mixage WAV et extraction/retouche locale de frames. Tout conserver. Les fichiers médias IndexedDB restent locaux au navigateur : ne pas annoncer une synchronisation interappareils inexistante.
+
+Le chat canonique est /chat via src/components/StreamingChat.tsx et src/lib/chat-stream.server.ts. Son prompt reste audiovisuel. Aucun routeur de commandes, mode DR MANATHAN, accusé « oui chef », QR d'accueil ou moteur de trading n'a été trouvé à cette base. Les quatre agents de modules.functions.ts sont des étapes LLM séquentielles, pas un ordinateur autonome. Les API Hémicycle, Featherless, Oriane et Higgsfield ne sont pas encore reliées au produit.
+
+Les vérifications de la mission prouvent seulement les points suivants :
+- Hémicycle MCP : initialize et tools/list réussis, 18 outils annoncés ; appel gratuit lister_jeux HTTP 200 avec contenu non vide. Les autres outils métier restent à tester selon le besoin.
+- Featherless : /plan authentifié HTTP 200 ; génération Qwen/Qwen3-VL-4B-Instruct HTTP 200, réponse attendue OK, 12 tokens. Streaming, vision et outils restent à tester séparément.
+- Mistral : catalogue de modèles HTTP 200 ; génération mistral-large-latest refusée HTTP 403. Vérifier accès/autorisation avant intégration.
+- Nouvelle clé ElevenLabs nommée MAVAI_DR_MANATHAN : /user HTTP 200 mais TTS réel sur « Oui chef. » refusé HTTP 401 ; STT non atteint. La cause précise est à diagnostiquer. Ne pas remplacer la clé de voix actuelle avant ce correctif.
+- Ancien OPENAI_API_KEY refusé HTTP 401. OPENAI_API_KEY2 a répondu HTTP 200 au catalogue. Nouvelle OPENAI_API_KEY_2 : catalogue HTTP 200, gpt-5.4 présent, une génération chat/completions HTTP 200 avec réponse attendue, finish_reason stop et 28 tokens au total. Ne pas remplacer arbitrairement les clés personnelles des autres utilisateurs.
+- Higgsfield : une tentative réelle du subscribe demandé a échoué HTTP 403, interprété NotEnoughCreditsError par le SDK 0.2.6. Aucune vidéo ni génération réussie confirmée. Ne pas relancer en boucle ; crédits ou accès du compte à résoudre.
+- Oriane : contrat d'authentification non documenté dans les éléments vérifiés ; ne pas inventer un header ou un endpoint.
+- Supabase : l'alias PUBLISHABLE_KEY_SUPABASE existe ; /auth/v1/health n'a retourné aucun statut HTTP (échec transport/client). Le fonctionnement du backend cible reste à vérifier.
+
+Ces constats sont datés ; refaire les contrôles nécessaires dans le runtime du clone. Ne pas afficher « toutes les API fonctionnent » à partir d'un catalogue ou d'un statut HTTP d'authentification.
+
+PHASE 0 — CLONE EXPLOITABLE ET BASELINE
+
+Créer les ressources distinctes du clone : auth, DB, stockage, URLs de retour OAuth, connexions et secrets. Mapper le nom PUBLISHABLE_KEY_SUPABASE trouvé dans Doppler vers SUPABASE_PUBLISHABLE_KEY attendu par le code seulement après avoir vérifié sa fonction. APP_USER_CONNECTION_KEY_SECRET et LOVABLE_API_KEY n'ont pas été trouvés sous ces noms exacts dans la configuration lvx inspectée : vérifier leur gestion effective par Lovable et les configurer si nécessaire. Ne pas inventer leurs valeurs. Conserver la clé de chiffrement adéquate uniquement si des données chiffrées autorisées sont effectivement migrées ; sinon créer celle du nouvel environnement.
+
+L'authentification Doppler de l'environnement d'audit ne configure pas automatiquement les secrets du nouveau projet Lovable. Établir le mapping explicite nom Doppler → secret serveur cible → fonction consommatrice, sans exporter les valeurs dans un chat. Si une clé manque, demander sa saisie dans l'interface Secrets ou localement, jamais dans le chat.
+
+Exécuter installation reproductible, tests et build avant modification. Référence obtenue : 79 tests racine passent, 17 tests Higgsfield passent, typecheck/lint ciblés Higgsfield et build passent. Le test natif sprites2d-core échoue sur un chemin de setup manquant ; une configuration d'audit externe a permis 16 tests réussis. Corriger/reproduire cette configuration séparément et ne pas présenter la commande native comme déjà verte. Documenter la dette préexistante distinctement des régressions.
+
+PHASE 1 — MODE GÉNÉRALISTE ET CONTRATS
+
+Ajouter un mode persistant enum audiovisual | dr_manathan, avec audiovisual par défaut pour toutes les conversations existantes. Ajouter le sélecteur à /chat, mode courant visible et retour immédiat vers MAVAI audiovisuel. Changer de mode ne détruit ni conversation, historique, projet, fichiers ni versions.
+
+Créer une politique partagée de prompts dans src/lib, utilisée par chat-stream.server.ts et les anciens chemins chat.functions.ts/mavai-ai.server.ts. Le mode DR traite les domaines généraux ; les capacités dépendent des outils réellement configurés. Préserver ANSWER_INSTRUCTIONS, la mémoire personnelle et les fonctions audiovisuelles. Conserver les connexions BYOK existantes et le fallback Lovable annoncé. Ajouter Featherless comme adaptateur serveur optionnel, sans remplacer les fournisseurs actuels ni généraliser une clé personnelle à tous les comptes.
+
+Contrats logiques à matérialiser avec Lovable : préférences de mode/voix ; command_events ; tool_runs/jobs ; evidence_sources ; provider_capabilities ; simulation_runs. Chaque enregistrement porte owner_id, project_id/conversation_id quand nécessaire, identifiant de corrélation, horodatages et statut. UUID, paramètres Zod et contrôles propriétaire serveur obligatoires. Pas de migration destructive. Les versions de production restent insert-only ; restauration = nouvelle version. Ne pas modifier à la main drizzle, migrations ou types générés.
+
+Un outil possède id, schéma d'entrée, permission, portée, coût éventuel, timeout, fonction serveur et schéma de résultat. États : recognized → acknowledged → executing → succeeded | failed | canceled. Persister un événement par transition utile ; idempotency_key empêche les doubles actions/facturations. Les logs excluent secrets et contenu sensible. Une erreur partielle n'est pas une réussite globale.
+
+PHASE 2 — ORDRES TEXTE ET AUDIO
+
+Créer un routeur déterministe partagé, par exemple src/lib/assistant-commands.ts. L'appeler pour le texte avant enqueueText et pour la transcription dans src/components/voice/voice-session.ts avant runAnswer. Même commande = mêmes permissions, effets et résultat dans les deux modes d'entrée. Ne pas déléguer les bascules d'état à une simple promesse du LLM.
+
+Séparer trois états : microphoneEnabled, speechOutputEnabled, assistantMode. Aujourd'hui mute() coupe le micro seulement et le micro actif impose la réponse vocale. Corriger cette confusion sans casser la file FIFO, la pause sur erreur, l'annulation et la lecture intégrale des questions ordinaires.
+
+Commandes minimales : « mode silence », « réactive la voix », « coupe le micro », « passe en mode DR MANATHAN », « retour à MAVAI », « arrête », « reprends », « répète », « nouvelle conversation », « ouvre mon projet … », « recherche … », « résume … », « exporte … ». Activer uniquement celles dont l'outil existe. Grammaire stricte, accents/casse normalisés, ambiguïté clarifiée. Un mot cité dans un document ou la phrase « écris le mot silence » ne déclenche rien.
+
+Avant dispatch, produire un accusé visible « Oui chef, … » pour mon compte ; audio si la sortie l'autorise. En silence, garder l'accusé texte. Ce reçu signifie « ordre compris », pas « action terminée ». Afficher ensuite le résultat réel. Pour silence/arrêt urgent, l'accusé texte précède immédiatement l'interruption ; ne pas attendre un appel TTS réseau avant de couper le son. Ces contrôles doivent contourner l'attente FIFO, tout en préservant les questions ordinaires déjà en file selon l'intention de l'ordre.
+
+« Silence » coupe la sortie vocale ; le micro peut rester actif si l'écoute a été autorisée, pour recevoir « réactive la voix ». « Micro coupé » désactive la capture ; annoncer alors une reprise par clic ou clavier. Ne jamais promettre un réveil vocal avec le micro désactivé. Ne pas ouvrir le micro automatiquement lors d'un changement de mode.
+
+PHASE 3 — OPEN DATA, OUTILS ET RECHERCHE
+
+Créer un adaptateur serveur Hémicycle vers https://api.hemicycle.ai/mcp. Faire initialize puis tools/list ; sélectionner explicitement les outils de lecture utiles parmi les outils réellement annoncés. Valider arguments/résultats, pagination, quotas, timeout et erreurs. Interdire qu'un contenu externe ou une description d'outil devienne une instruction privilégiée.
+
+Créer un adaptateur Featherless compatible avec sa documentation officielle et le plan du compte. Vérifier le modèle disponible et ses capacités avant choix : streaming, contexte, vision et appels d'outils ne sont pas garantis identiques pour tous les modèles. Ajouter un test court borné avec plafond de tokens/coût et repli explicite. Fournir des résultats Open Data avec source, lien, date de publication, date de collecte et limites d'interprétation. Le format normalisé contient résumé, observations, sources, données et avertissements factuels.
+
+Scénario démo : question texte ou voix sur une donnée parlementaire, recherche Hémicycle réelle, synthèse sourcée, tableau ou graphique simple, export, puis reprise du mode audiovisuel pour préparer un contenu de présentation. Une source politique n'est pas, à elle seule, un signal fiable de prix ou une preuve de causalité économique.
+
+Pour PDF/documents/tableaux, ajouter un pipeline d'import/extraction serveur avec limites de taille/type, statut et portée propriétaire. Le schéma actuel du chat n'accepte que texte et images PNG/JPEG/WebP. Ne pas afficher un bouton fonctionnel de document sans extraction réelle. Oriane reste « à configurer » jusqu'à vérification du contrat officiel et test approprié.
+
+PHASE 4 — VIDÉO ET QR DE PRÉSENTATION
+
+Conserver l'exemple serveur examples/higgsfield/index.ts : SDK officiel @higgsfield/client/v2, subscribe avec polling, modèle bytedance/seedance-2.5/text-to-video, prompt « A cinematic scene at sunset », durée 5, résolution 720p, aspect_ratio 16:9. HF_CREDENTIALS reste serveur au format key-id:key-secret ; .env.local est ignoré par Git. Ne jamais importer l'exemple dans React. Succès uniquement après completed et URL vidéo HTTPS valide ; échec, annulation, modération et timeout restent des échecs ou états non confirmés.
+
+Le test live est actuellement bloqué par crédits/accès. Une fois ce blocage résolu, exécuter une seule génération autorisée, attendre le statut terminal, conserver request_id et URL résultante, et vérifier la ressource. Un timeout n'annule pas nécessairement la requête distante : consulter son état avant toute nouvelle soumission. L'intégration produit future utilise un job persistant, contrôle propriétaire et idempotence.
+
+Ajouter sur src/routes/index.tsx un QR généré localement, accessible et lisible sur projection, accompagné d'un lien texte. Encoder l'URL HTTPS canonique réellement publiée du clone, obtenue par configuration ; jamais un jeton, l'URL de l'éditeur ou par défaut l'ancienne instance. Garder les CTA et le contenu d'accueil existants. Vérifier scan sur téléphone, petit écran, accès invité puis authentification normale. Un QR n'accorde aucun droit particulier.
+
+PHASE 5 — BNB : SIMULATION PUIS CADRAGE
+
+Le dépôt https://github.com/RomThpt/bnb.git contient un guide BNB Builder Sessions, pas un moteur de trading à intégrer tel quel. Construire d'abord un portefeuille et des ordres simulés, avec données datées, frais, slippage et journal ; distinguer historique, paper trading et testnet. Aucun ordre réel ou signature mainnet dans la démo.
+
+Avant activation réelle, résoudre le choix A/B/C du dossier : actif/exchange spot, exécution on-chain BNB Chain, ou autre usage BNB. Identifier marché, réseau, paires, sources, wallet/compte, budget, limites de pertes/exposition et autorisation d'exécution. Un contrôleur déterministe valide les ordres proposés par l'IA : fraîcheur des prix, solde, taille, spread, exposition, drawdown, doublons et kill switch. Clés d'exchange sans retrait et signatures isolées du LLM. Ne jamais inventer une rentabilité ni l'accès à une API absente.
+
+RECETTE ET LIVRAISON
+
+Livrer par petites tranches fonctionnelles, continuer sans demandes de confirmation routinières. Signaler précisément les informations indispensables manquantes tout en poursuivant les parties indépendantes. Ne pas activer des dépenses ou du trading réel hors du périmètre déjà autorisé.
+
+Preuves attendues : fichiers modifiés, migrations réalisées par Lovable, tests et commandes exacts, résultats de build, captures de démo, matrice API avec états configuré/authentifié/fonction testé/indisponible, coûts des tests facturables, limitations et procédure de rollback. Tester deux comptes et deux projets, reload de conversation, archivage/restauration, mémoire liée, fichiers locaux, ressources versionnées, BYOK et fallback.
+
+Recette voix : commandes texte/audio équivalentes, accusé avant effet, aucune fausse commande sur contenu cité, silence pendant TTS sans attente FIFO, reprise cohérente, micro coupé réellement indiqué, refus micro, autoplay bloqué, session expirée et annulation STT/TTS. Tester les erreurs 401/402/403/429 et la panne de chaque nouvelle API sans casser les modules existants. Vérifier absence de secrets dans bundle, réponses, logs, Git et archive. Conclure avec ce qui fonctionne réellement et ce qui reste bloqué ; aucune certification globale sans preuve.
