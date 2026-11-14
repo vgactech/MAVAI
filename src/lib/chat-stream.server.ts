@@ -1,3 +1,5 @@
+import { wantsAdvancedModel } from "./model-tier";
+import { extractMemoryRule } from "./memory-capture";
 // CERTIFIED_100=false | unique_human_proven=false | DEBUG
 import { createClient } from "@supabase/supabase-js";
 import { streamText, convertToModelMessages, createUIMessageStream, createUIMessageStreamResponse, toUIMessageStream, type ToolSet, type UIMessage } from "ai";
@@ -72,6 +74,11 @@ export async function handleChatStream(request: Request) {
       writer.write({ type: "start", messageId: assistantId, messageMetadata: { provider: "Lovable AI", startedAt: new Date(started).toISOString(), stage: "preparation" } });
       step("context", { label: "Message enregistré", detail: `${contextMessages.length} message${contextMessages.length > 1 ? "s" : ""} de la conversation relus`, status: "done" });
       step("memory", { label: "Lecture de la mémoire du projet…", status: "running" });
+      const rule = extractMemoryRule(text);
+      if (rule) {
+        const { data: dup } = await sb.from("memories").select("id").eq("user_id", userId).eq("content", rule).limit(1);
+        if (!dup?.length) { const { error: saveErr } = await sb.from("memories").insert({ user_id: userId, content: rule, project_id: null }); step("memory-save", saveErr ? { label: "Règle non enregistrée", detail: saveErr.message, status: "error" } : { label: "Règle enregistrée en mémoire", detail: "Appliquée à tous tes chats", status: "done" }); }
+      }
       const { data: memory, error: memoryError } = await sb.from("memories").select("content").eq("user_id", userId).or(conversation.project_id ? `project_id.eq.${conversation.project_id},project_id.is.null` : "project_id.is.null").order("created_at", { ascending: false }).limit(50);
       memoryCount = memory?.length ?? 0;
       step("memory", memoryError ? { label: "Mémoire indisponible", detail: "Réponse préparée sans la mémoire du projet", status: "error" } : { label: "Mémoire du projet consultée", detail: memoryCount ? `${memoryCount} élément${memoryCount > 1 ? "s" : ""} retenu${memoryCount > 1 ? "s" : ""}` : "Aucune mémoire enregistrée (projet ou générale)", status: "done" });
@@ -109,11 +116,15 @@ export async function handleChatStream(request: Request) {
       let providerName = "Lovable AI";
       let outcome: Awaited<ReturnType<typeof run>> | null = null;
       if (own) {
-        step("generation", { label: `Rédaction avec votre compte ${own.name}…`, detail: own.model, status: "running" });
         const ownProvider = createOpenAICompatible({ name: own.provider, baseURL: own.baseURL, apiKey: own.apiKey, includeUsage: true });
-        outcome = await run(ownProvider.chatModel(own.model));
-        if (outcome.emitted) providerName = own.name;
-        else if (outcome.failed) { step("provider", { label: "Votre compte externe n'a pas pu répondre", detail: explainProviderError(own.name, outcome.errorText), status: "error" }); outcome = null; }
+        const tiers = wantsAdvancedModel(text) ? [own.model] : [own.cheapModel, own.model];
+        for (const [i, modelName] of tiers.entries()) {
+          step("generation", { label: `Rédaction avec votre compte ${own.name}…`, detail: `${modelName} (${modelName === own.model ? "modèle avancé" : "modèle économique"})`, status: "running" });
+          outcome = await run(ownProvider.chatModel(modelName));
+          if (outcome.emitted) { providerName = own.name; break; }
+          if (outcome.failed) { step("provider", { label: i < tiers.length - 1 ? "Modèle économique en échec, passage au modèle avancé" : "Votre compte externe n'a pas pu répondre", detail: explainProviderError(own.name, outcome.errorText), status: "error" }); outcome = null; }
+          else break;
+        }
       }
       if (!outcome && !request.signal.aborted) {
         step("generation", { label: "Recherche web et rédaction de la réponse…", detail: "Lovable AI", status: "running" });

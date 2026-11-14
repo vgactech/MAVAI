@@ -1,12 +1,12 @@
 // Picks the chat model from the user's own connected AI account (most recently connected wins).
 import type { ProviderId } from "./external-providers";
 
-export const CHAT_CAPABLE: Partial<Record<ProviderId, { name: string; baseURL: string; model: string }>> = {
-  openai: { name: "ChatGPT (OpenAI)", baseURL: "https://api.openai.com/v1", model: "gpt-5.4" },
-  anthropic: { name: "Claude (Anthropic)", baseURL: "https://api.anthropic.com/v1", model: "claude-sonnet-5-5" },
-  gemini: { name: "Gemini (Google)", baseURL: "https://generativelanguage.googleapis.com/v1beta/openai", model: "gemini-2.5-flash" },
-  mistral: { name: "Mistral AI", baseURL: "https://api.mistral.ai/v1", model: "mistral-medium-latest" },
-  perplexity: { name: "Perplexity", baseURL: "https://api.perplexity.ai", model: "sonar" },
+export const CHAT_CAPABLE: Partial<Record<ProviderId, { name: string; baseURL: string; model: string; cheapModel: string }>> = {
+  openai: { name: "ChatGPT (OpenAI)", baseURL: "https://api.openai.com/v1", model: "gpt-5.4", cheapModel: "gpt-5-mini" },
+  anthropic: { name: "Claude (Anthropic)", baseURL: "https://api.anthropic.com/v1", model: "claude-sonnet-5-5", cheapModel: "claude-haiku-4-5" },
+  gemini: { name: "Gemini (Google)", baseURL: "https://generativelanguage.googleapis.com/v1beta/openai", model: "gemini-2.5-pro", cheapModel: "gemini-2.5-flash-lite" },
+  mistral: { name: "Mistral AI", baseURL: "https://api.mistral.ai/v1", model: "mistral-large-latest", cheapModel: "mistral-small-latest" },
+  perplexity: { name: "Perplexity", baseURL: "https://api.perplexity.ai", model: "sonar-pro", cheapModel: "sonar" },
 };
 
 export async function getUserChatModel(userId: string) {

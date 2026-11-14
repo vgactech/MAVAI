@@ -7,7 +7,7 @@ export type MavaiDataParts = { step: ChatStep };
 export type MavaiUIMessage = UIMessage<unknown, MavaiDataParts>;
 
 /** Stable ids: rewriting a step with the same id updates it in place instead of adding a line. */
-export const CHAT_STEP_IDS = ['context', "linked", 'memory', 'artcb', 'provider', 'generation'] as const;
+export const CHAT_STEP_IDS = ['context', "linked", 'memory', 'memory-save', 'artcb', 'provider', 'generation'] as const;
 export type ChatStepId = (typeof CHAT_STEP_IDS)[number];
 
 type AnyPart = { type: string; [key: string]: unknown };

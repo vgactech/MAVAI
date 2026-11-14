@@ -73,3 +73,5 @@
 - [x] Durée de vidéo : 30 s, 1, 3, 10, 30 min ou durée libre
 - [x] Coûts/budget : gérés par les plateformes externes (rien dans MAVAI)
 - [ ] Génération de plans, voix par réplique, ligne de temps, sous-titres, exports, validation client : branchés sur cet arbre aux prochaines étapes
+- [x] Clés perso : modèle économique par défaut, modèle avancé seulement pour révision finale ou échec
+- [x] Mémoire : règles dites dans le chat enregistrées automatiquement (sans doublon)
