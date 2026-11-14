@@ -17,7 +17,7 @@ export function useProjectSearch() {
 }
 function useOpenConversation() { return (useSearch({strict:false}) as {c?:string}).c; }
 export const moduleLinks = [
-  ['/chat','Chat'],['/signal-desk','Signal Desk'],['/memoire','Mémoire'],['/agents','Agents'],['/studio','Studio'],['/decoupage','Découpage'],['/character-studio','Personnages'],['/audio-studio','Audio Studio'],['/frame-control','Frame Control'],['/continuity','Continuité'],
+  ['/chat','Chat'],['/bnb','Poste BNB'],['/signal-desk','Signal Desk'],['/memoire','Mémoire'],['/agents','Agents'],['/studio','Studio'],['/decoupage','Découpage'],['/character-studio','Personnages'],['/audio-studio','Audio Studio'],['/frame-control','Frame Control'],['/continuity','Continuité'],
 ] as const;
 export function ProjectWorkspace({children,required=true,projectId}:{children:ReactNode;required?:boolean;projectId?:string|undefined}) {
   const fromSearch=useProjectSearch(); const project = projectId??fromSearch; const navigate = useNavigate(); const openConversation=useOpenConversation();

@@ -53,3 +53,6 @@ use the editor.
 - Shared answer instructions govern both streaming and legacy chat; personal display rules must not become mandatory for all users.
 - Audio wave canvases overlay only the composer top border and read the existing analyser nodes; the fixed sides and bottom never animate.
 - Chat full-memory links: conversations.linked_conversation_ids lists other owned chats (any project) whose full history /api/chat reads as read-only context; owner checked on save and read.
+- Orders (silence, voix, micro, modes, arrête, répète, nouvelle conversation, poste BNB) go through the deterministic `src/lib/assistant-commands.ts` router before the FIFO for both text and voice; the "Oui chef" ack is shown before the effect and each transition is logged in command_events.
+- Microphone, speech output and assistant mode are three independent states; conversations.assistant_mode (audiovisual default) only prefixes the system prompt, never removes audiovisual features.
+- BNB trades are user-signed in the browser wallet (viem, PancakeSwap mainnet) after the deterministic `checkTrade` controller; the AI only analyses and never executes trades. Context sources (Hémicycle, Oriane) are labelled non-predictive.

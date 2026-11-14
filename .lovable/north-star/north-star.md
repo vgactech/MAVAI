@@ -2,8 +2,8 @@
 
 # Cap
 
-Les créateurs audiovisuels terminent les productions qu'ils ont entrepris de réaliser.
+Les traders réalisent sur BNB Chain des trades bien informés qu'ils ont choisis eux-mêmes
 
 ## Indicateur
 
-Conversations où l'assistant a fourni une réponse chaque jour
+Trades confirmés sur BNB Chain chaque semaine

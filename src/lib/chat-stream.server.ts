@@ -21,6 +21,8 @@ const userMessageSchema = z.object({
   ])).min(1),
 });
 
+const DR_MANATHAN_PREFIX = "MODE DR MANATHAN ACTIF : tu es DR MANATHAN, assistant généraliste de MAVAI (recherche, documents, analyse de données, rédaction, marchés et BNB Chain). Ignore la spécialisation audiovisuelle ci-dessous sauf si l'utilisateur la demande. Pour les marchés : distingue données datées, contexte (politique, Open Data, social) et signal ; le contexte n'est jamais une preuve de prédiction de prix. Tu ne passes jamais d'ordre de trading toi-même : les transactions BNB sont préparées dans le poste BNB, vérifiées et signées par l'utilisateur dans son wallet. Ne présente aucune rentabilité inventée. ";
+
 export async function handleChatStream(request: Request) {
   const url = process.env["SUPABASE_URL"]; const key = process.env["SUPABASE_PUBLISHABLE_KEY"]; const aiKey = process.env["LOVABLE_API_KEY"];
   const authorization = request.headers.get("Authorization");
@@ -34,7 +36,7 @@ export async function handleChatStream(request: Request) {
   const latestParsed = body.success ? userMessageSchema.safeParse(body.data.messages.at(-1)) : null;
   if (!body.success || !latestParsed?.success) return Response.json({ error: "Message invalide." }, { status: 400 });
   const { conversationId } = body.data; const latest = latestParsed.data as MavaiUIMessage;
-  const { data: conversation } = await sb.from("conversations").select("id,project_id,title,linked_conversation_ids").eq("id", conversationId).eq("user_id", userId).single();
+  const { data: conversation } = await sb.from("conversations").select("id,project_id,title,linked_conversation_ids,assistant_mode").eq("id", conversationId).eq("user_id", userId).single();
   if (!conversation) return Response.json({ error: "Conversation introuvable." }, { status: 404 });
   const text = latest.parts.filter(p => p.type === "text").map(p => p.text).join("\n");
   const { data: existing } = await sb.from("messages").select("id").eq("conversation_id", conversationId).eq("client_message_id", latest.id).maybeSingle();
@@ -89,7 +91,8 @@ export async function handleChatStream(request: Request) {
       artcbStored = artcb?.stored ?? false;
       step("artcb", artcb ? { label: artcbStored ? "Raisonnement enregistré dans ARTcB" : "ARTcB a répondu", detail: artcb.encoded ? "Accusé d’encodage reçu" : undefined, status: "done" } : { label: "ARTcB non joignable", detail: "MAVAI répond sans ARTcB", status: "skipped" });
       if (request.signal.aborted) return;
-      const system = systemPrompt = `Tu es MAVAI, assistant de production audiovisuelle. Date UTC: ${new Date().toISOString()}. Recherche sur Google toute actualité et cite des liens sans prétendre qu’ils sont vérifiés. Mémoire utilisateur: ${(memory ?? []).map(m => m.content).join("\n")}.${linkedMemory ? ` Historique complet des chats liés par l’utilisateur (lecture seule, à utiliser comme mémoire) :\n${linkedMemory}\n` : ""} Préserve le contrôle artistique humain. Tu ne peux pas inspecter ni modifier ton code source, déployer, gérer les secrets ou contacter des services sans outil explicite. Tu peux analyser les images jointes, répondre, rechercher et préparer des propositions. Ne prétends jamais avoir exécuté une action sans résultat d’outil. Les modèles, tokens et mémoires doivent être ceux réellement communiqués, jamais inventés. ${ANSWER_INSTRUCTIONS} En production, chaque élément (plan, prise, image, personnage, décor, voix, réplique, musique, bruitage, sous-titre, couleur, effet, version) reste séparé et versionné avant et après assemblage : l’assemblage ne fait que référencer les éléments, pour que toute correction se fasse au détail près sans perte.`;
+      const drMode = conversation.assistant_mode === "dr_manathan";
+      const system = systemPrompt = (drMode ? DR_MANATHAN_PREFIX : "") + `Tu es MAVAI, assistant de production audiovisuelle. Date UTC: ${new Date().toISOString()}. Recherche sur Google toute actualité et cite des liens sans prétendre qu’ils sont vérifiés. Mémoire utilisateur: ${(memory ?? []).map(m => m.content).join("\n")}.${linkedMemory ? ` Historique complet des chats liés par l’utilisateur (lecture seule, à utiliser comme mémoire) :\n${linkedMemory}\n` : ""} Préserve le contrôle artistique humain. Tu ne peux pas inspecter ni modifier ton code source, déployer, gérer les secrets ou contacter des services sans outil explicite. Tu peux analyser les images jointes, répondre, rechercher et préparer des propositions. Ne prétends jamais avoir exécuté une action sans résultat d’outil. Les modèles, tokens et mémoires doivent être ceux réellement communiqués, jamais inventés. ${ANSWER_INSTRUCTIONS} En production, chaque élément (plan, prise, image, personnage, décor, voix, réplique, musique, bruitage, sous-titre, couleur, effet, version) reste séparé et versionné avant et après assemblage : l’assemblage ne fait que référencer les éléments, pour que toute correction se fasse au détail près sans perte.`;
       const modelMessages = await convertToModelMessages(contextMessages);
       const { createOpenAICompatible } = await import("@ai-sdk/openai-compatible");
       // Streams one model; parts are buffered until the first real output so a provider that fails up-front can be replaced silently.

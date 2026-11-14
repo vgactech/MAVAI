@@ -1,0 +1,284 @@
+{
+  "audit_date": "2026-11-14",
+  "timezone": "Europe/Paris",
+  "base_commit": "d82ccc8091a40cbc57f67cb85a292f21928cbef1",
+  "credentials_included": false,
+  "real_trades_executed": false,
+  "openai": {
+    "provider": "OpenAI",
+    "variable": "OPENAI_API_KEY_2",
+    "checked_at": "2026-11-14T11:49:41.289Z",
+    "max_completion_tokens": 256,
+    "generation_attempts": 1,
+    "models_http_status": 200,
+    "configured_model_available": true,
+    "model": "gpt-5.4",
+    "generation_http_status": 200,
+    "finish_reason": "stop",
+    "nonempty_answer": true,
+    "expected_answer": true,
+    "usage": {
+      "prompt_tokens": 12,
+      "completion_tokens": 16,
+      "total_tokens": 28
+    }
+  },
+  "voice": {
+    "provider": "ElevenLabs",
+    "variable": "MAVAI_DR_MANATHAN",
+    "checked_at": "2026-11-14T11:51:13.334Z",
+    "tts_characters": 9,
+    "tts_http_status": 401
+  },
+  "initial_get_probes": [
+    {
+      "provider": "OpenAI",
+      "variable": "(none)",
+      "http_status": 401,
+      "auth_verdict": "auth_or_permission_rejected",
+      "timestamp": "2026-11-14T11:44:13.803038+00:00"
+    },
+    {
+      "provider": "OpenAI",
+      "variable": "OPENAI_API_KEY",
+      "http_status": 401,
+      "auth_verdict": "auth_or_permission_rejected",
+      "timestamp": "2026-11-14T11:44:13.803725+00:00"
+    },
+    {
+      "provider": "Mistral",
+      "variable": "(none)",
+      "http_status": 401,
+      "auth_verdict": "auth_or_permission_rejected",
+      "timestamp": "2026-11-14T11:44:13.804296+00:00"
+    },
+    {
+      "provider": "Mistral",
+      "variable": "MISTRAL_API_KEY",
+      "http_status": 200,
+      "auth_verdict": "authenticated_get_succeeded",
+      "timestamp": "2026-11-14T11:44:13.806155+00:00",
+      "count": 53
+    },
+    {
+      "provider": "ElevenLabs user",
+      "variable": "(none)",
+      "http_status": 401,
+      "auth_verdict": "auth_or_permission_rejected",
+      "timestamp": "2026-11-14T11:44:13.926743+00:00"
+    },
+    {
+      "provider": "ElevenLabs user",
+      "variable": "ELEVENLABS_API_KEY",
+      "http_status": 200,
+      "auth_verdict": "authenticated_get_succeeded",
+      "timestamp": "2026-11-14T11:44:14.025560+00:00"
+    },
+    {
+      "provider": "ElevenLabs voices",
+      "variable": "(none)",
+      "http_status": 200,
+      "auth_verdict": "public_endpoint_reachable_key_not_validated",
+      "timestamp": "2026-11-14T11:44:14.054204+00:00",
+      "count": 21
+    },
+    {
+      "provider": "ElevenLabs voices",
+      "variable": "ELEVENLABS_API_KEY",
+      "http_status": 200,
+      "auth_verdict": "public_endpoint_reachable_key_not_validated",
+      "timestamp": "2026-11-14T11:44:14.063986+00:00",
+      "count": 21
+    },
+    {
+      "provider": "ElevenLabs user",
+      "variable": "MAVAI_DR_MANATHAN",
+      "http_status": 200,
+      "auth_verdict": "authenticated_get_succeeded",
+      "timestamp": "2026-11-14T11:44:14.492732+00:00"
+    },
+    {
+      "provider": "ElevenLabs voices",
+      "variable": "MAVAI_DR_MANATHAN",
+      "http_status": 200,
+      "auth_verdict": "public_endpoint_reachable_key_not_validated",
+      "timestamp": "2026-11-14T11:44:14.673765+00:00",
+      "count": 21
+    },
+    {
+      "provider": "Featherless",
+      "variable": "(none)",
+      "http_status": 200,
+      "auth_verdict": "public_endpoint_reachable_key_not_validated",
+      "timestamp": "2026-11-14T11:44:14.781683+00:00",
+      "count": 50
+    },
+    {
+      "provider": "Featherless",
+      "variable": "FEATHERLESS_AI_API",
+      "http_status": 200,
+      "auth_verdict": "public_endpoint_reachable_key_not_validated",
+      "timestamp": "2026-11-14T11:44:14.782217+00:00",
+      "count": 50
+    }
+  ],
+  "additional_probes": [
+    {
+      "provider": "Featherless plan",
+      "variable": "(none)",
+      "http_status": 401,
+      "scope": "control_or_failed_get",
+      "timestamp": "2026-11-14T11:46:14.175423+00:00"
+    },
+    {
+      "provider": "Featherless plan",
+      "variable": "FEATHERLESS_AI_API",
+      "http_status": 200,
+      "scope": "authenticated_get",
+      "timestamp": "2026-11-14T11:46:14.277070+00:00"
+    },
+    {
+      "provider": "OpenAI alternate",
+      "variable": "OPENAI_API_KEY2",
+      "http_status": 200,
+      "scope": "authenticated_get",
+      "timestamp": "2026-11-14T11:46:14.981114+00:00"
+    },
+    {
+      "provider": "Hemicycle MCP",
+      "variable": "HEMICYCLE_AI_API",
+      "http_status": 200,
+      "scope": "initialize_and_tools_list",
+      "timestamp": "2026-11-14T11:46:16.252828+00:00",
+      "tool_count": 18,
+      "tool_names": [
+        "guide",
+        "lister_jeux",
+        "interroger",
+        "classement_auteurs",
+        "accord_groupes",
+        "loyaute_deputes",
+        "positions_groupes",
+        "rechercher",
+        "lire_texte",
+        "lire_amendement",
+        "lire_scrutin",
+        "resultat_scrutin",
+        "lire_acteur",
+        "predire_vote",
+        "chercher_entreprise",
+        "chercher_donnees_publiques",
+        "lire_donnees_publiques",
+        "solde_credits"
+      ]
+    },
+    {
+      "provider": "ARTcB health",
+      "variable": "ARTCB_API_URL",
+      "http_status": null,
+      "scope": "url_absent_or_invalid",
+      "timestamp": "2026-11-14T11:46:13.550033+00:00"
+    }
+  ],
+  "final_function_probes": [
+    {
+      "provider": "Hemicycle",
+      "variable": "HEMICYCLE_AI_API",
+      "timestamp": "2026-11-14T11:53:05.633653+00:00",
+      "operation": "MCP initialize",
+      "http_status": 200,
+      "result": "initialized"
+    },
+    {
+      "provider": "Hemicycle",
+      "variable": "HEMICYCLE_AI_API",
+      "timestamp": "2026-11-14T11:53:08.427002+00:00",
+      "operation": "MCP initialized notification",
+      "http_status": 202,
+      "result": "sent"
+    },
+    {
+      "provider": "Hemicycle",
+      "variable": "HEMICYCLE_AI_API",
+      "timestamp": "2026-11-14T11:53:09.255762+00:00",
+      "operation": "MCP tools/list",
+      "http_status": 200,
+      "result": "listed",
+      "tool_count": 18,
+      "lister_jeux_available": true
+    },
+    {
+      "provider": "Hemicycle",
+      "variable": "HEMICYCLE_AI_API",
+      "timestamp": "2026-11-14T11:53:11.807024+00:00",
+      "operation": "MCP tools/call lister_jeux",
+      "http_status": 200,
+      "documented_credit_cost": 0,
+      "result": "read_tool_succeeded"
+    },
+    {
+      "provider": "Supabase",
+      "variable": "SUPABASE_URL + PUBLISHABLE_KEY_SUPABASE",
+      "timestamp": "2026-11-14T11:53:05.634686+00:00",
+      "operation": "GET /auth/v1/health",
+      "http_status": null,
+      "result": "transport_or_client_failure"
+    },
+    {
+      "provider": "Mistral",
+      "variable": "MISTRAL_API_KEY",
+      "timestamp": "2026-11-14T11:53:05.635379+00:00",
+      "operation": "POST /v1/chat/completions",
+      "model": "mistral-large-latest",
+      "max_tokens": 32,
+      "http_status": 403,
+      "result": "auth_or_permission_rejected"
+    },
+    {
+      "provider": "Featherless",
+      "variable": "FEATHERLESS_AI_API",
+      "timestamp": "2026-11-14T11:53:05.635935+00:00",
+      "operation": "POST /v1/chat/completions",
+      "model": "Qwen/Qwen3-VL-4B-Instruct",
+      "max_tokens": 32,
+      "http_status": 200,
+      "nonempty_output": true,
+      "expected_ok": true,
+      "prompt_tokens": 11,
+      "completion_tokens": 1,
+      "total_tokens": 12,
+      "reported_cost_usd": 5.6e-06,
+      "completion_within_cap": true,
+      "finish_reason": "stop",
+      "result": "generation_succeeded"
+    }
+  ],
+  "higgsfield": {
+    "attempts": 1,
+    "sdk": "@higgsfield/client@0.2.6",
+    "method": "subscribe",
+    "model": "bytedance/seedance-2.5/text-to-video",
+    "prompt": "A cinematic scene at sunset",
+    "duration": 5,
+    "resolution": "720p",
+    "aspect_ratio": "16:9",
+    "exit_code": 1,
+    "http_status": 403,
+    "status_evidence": "SDK NotEnoughCreditsError maps HTTP403",
+    "success": false,
+    "video_url": null,
+    "billing_debit_not_verified": true
+  },
+  "verification": {
+    "mavai_tests_passed": 79,
+    "higgsfield_tests_passed": 17,
+    "higgsfield_typecheck": "passed",
+    "higgsfield_targeted_lint": "passed",
+    "production_build": "passed_with_existing_warnings",
+    "sprites_native_test": "failed_missing_relative_setup",
+    "sprites_audit_config_tests_passed": 16,
+    "actual_browser_voice_flow": "not_tested",
+    "homepage_qr_integration": "planned_for_lovable",
+    "qr_phone_scan": "not_tested"
+  }
+}

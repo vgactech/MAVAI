@@ -1,0 +1,31 @@
+MAVAI + DR MANATHAN — dossier de transfert pour Lovable
+14 novembre 2026 — Europe/Paris
+
+Commencer par PROMPT-LOVABLE.txt, puis le dossier PDF ou Word.
+
+Contenu
+- MAVAI-DR-MANATHAN-Dossier.pdf : audit, technologies, cahier des charges et roadmap (12 pages).
+- MAVAI-DR-MANATHAN-Dossier.docx : version éditable.
+- PROMPT-LOVABLE.txt : mission phasée à coller dans Lovable après Remix.
+- MATRICE-API.csv et PREUVES-VERIFICATION.json : résultats réels et limites.
+- QR-MAVAI-actuel.png / .svg : cible https://mavai-studio.lovable.app ; à remplacer pour le futur clone.
+- examples/higgsfield/ dans le dépôt : exemple SDK serveur, notice et tests.
+
+Le code produit MAVAI est conservé. Les fonctions DR MANATHAN, les commandes
+vocales et le QR sur accueil sont spécifiés pour l'implémentation Lovable.
+L'exemple Higgsfield est ajouté ; sa génération réelle reste bloquée HTTP403.
+
+Copier le projet
+Voie recommandée : Remix depuis le projet Lovable existant, puis nouveau dépôt.
+Alternative : télécharger le ZIP de cette branche et utiliser l'import code Lovable.
+Le code seul ne transporte pas les utilisateurs, données et valeurs de secrets.
+Reconfigurer les secrets via le formulaire sécurisé du clone, jamais le chat.
+
+Points de vigilance constatés
+OPENAI_API_KEY_2 : texte OK.
+Hémicycle et Featherless : lectures/générations courtes vérifiées selon matrice.
+Higgsfield403, Mistral génération403, nouveau TTS ElevenLabs401.
+Supabase non confirmé côté transport ; Oriane auth à documenter.
+La recette du produit complet dans le nouveau déploiement reste à exécuter.
+
+Aucune clé ni valeur Doppler dans les livrables. Aucun ordre de trading exécuté.

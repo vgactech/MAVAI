@@ -16,6 +16,9 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { MavaiMark } from "@/components/MavaiMark";
 import { getCurrentUser } from "@/lib/auth-session";
+import { QRCodeSVG } from "qrcode.react";
+
+const PUBLIC_URL = "https://mavaidrmanathan.lovable.app";
 import sentinelPoster from "@/assets/videos/binance-sentinel-mavai-poster.png.asset.json";
 
 export const Route = createFileRoute("/")({
@@ -146,6 +149,13 @@ function Home() {
             <a href="#probleme">Voir le pitch</a>
           </Button>
         </div>
+        <figure className="mt-10 inline-flex items-center gap-4 rounded-lg border border-border bg-background p-4">
+          <QRCodeSVG value={PUBLIC_URL} size={168} marginSize={2} title="QR code vers la plateforme MAVAI DR MANATHAN" className="rounded bg-background" />
+          <figcaption className="max-w-48 text-sm">
+            <span className="block font-semibold">Scannez pour accéder à la plateforme</span>
+            <a href={PUBLIC_URL} className="mt-1 block break-all text-muted-foreground underline">{PUBLIC_URL.replace("https://", "")}</a>
+          </figcaption>
+        </figure>
         </div>
       </section>
 

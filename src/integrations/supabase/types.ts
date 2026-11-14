@@ -41,9 +41,114 @@ export type Database = {
         }
         Relationships: []
       }
+      bnb_trades: {
+        Row: {
+          amount_in: string
+          block_number: number | null
+          chain_id: number
+          created_at: string
+          error: string | null
+          id: string
+          min_amount_out: string
+          quoted_amount_out: string
+          side: string
+          slippage_bps: number
+          status: string
+          token_in: string
+          token_out: string
+          tx_hash: string | null
+          updated_at: string
+          user_id: string
+          wallet_address: string
+        }
+        Insert: {
+          amount_in: string
+          block_number?: number | null
+          chain_id?: number
+          created_at?: string
+          error?: string | null
+          id?: string
+          min_amount_out: string
+          quoted_amount_out: string
+          side: string
+          slippage_bps: number
+          status?: string
+          token_in: string
+          token_out: string
+          tx_hash?: string | null
+          updated_at?: string
+          user_id: string
+          wallet_address: string
+        }
+        Update: {
+          amount_in?: string
+          block_number?: number | null
+          chain_id?: number
+          created_at?: string
+          error?: string | null
+          id?: string
+          min_amount_out?: string
+          quoted_amount_out?: string
+          side?: string
+          slippage_bps?: number
+          status?: string
+          token_in?: string
+          token_out?: string
+          tx_hash?: string | null
+          updated_at?: string
+          user_id?: string
+          wallet_address?: string
+        }
+        Relationships: []
+      }
+      command_events: {
+        Row: {
+          command: string
+          conversation_id: string | null
+          correlation_id: string
+          created_at: string
+          detail: Json
+          id: string
+          source: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          command: string
+          conversation_id?: string | null
+          correlation_id?: string
+          created_at?: string
+          detail?: Json
+          id?: string
+          source: string
+          status: string
+          user_id: string
+        }
+        Update: {
+          command?: string
+          conversation_id?: string | null
+          correlation_id?: string
+          created_at?: string
+          detail?: Json
+          id?: string
+          source?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "command_events_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       conversations: {
         Row: {
           archived_at: string | null
+          assistant_mode: string
           created_at: string
           id: string
           linked_conversation_ids: string[]
@@ -54,6 +159,7 @@ export type Database = {
         }
         Insert: {
           archived_at?: string | null
+          assistant_mode?: string
           created_at?: string
           id?: string
           linked_conversation_ids?: string[]
@@ -64,6 +170,7 @@ export type Database = {
         }
         Update: {
           archived_at?: string | null
+          assistant_mode?: string
           created_at?: string
           id?: string
           linked_conversation_ids?: string[]
