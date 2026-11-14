@@ -75,3 +75,12 @@
 - [ ] Génération de plans, voix par réplique, ligne de temps, sous-titres, exports, validation client : branchés sur cet arbre aux prochaines étapes
 - [x] Clés perso : modèle économique par défaut, modèle avancé seulement pour révision finale ou échec
 - [x] Mémoire : règles dites dans le chat enregistrées automatiquement (sans doublon)
+
+## Mission DR MANATHAN (14 nov 2026)
+- [x] Base de données MAVAI dans le nouveau Cloud
+- [x] Secrets serveur depuis Doppler (lvx/prd)
+- [x] Mode DR MANATHAN + ordres texte/voix avec « Oui chef »
+- [x] BNB Chain (priorité) : données marché, wallet, analyses, transactions choisies et signées par l'utilisateur dans son wallet, suivi ; pas d'exécution autonome
+- [x] Sources contexte (Hémicycle, Oriane) marquées « contexte, pas prédictif »
+- [x] QR code sur l'accueil
+- [x] Publication

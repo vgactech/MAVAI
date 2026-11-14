@@ -7,6 +7,8 @@ export type VoiceAdapters = {
   onTranscript: (id: string, role: 'user' | 'assistant', text: string) => void;
   onState: (state: { phase: VoicePhase; pending: number; muted: boolean; error: string | null; transcribing?: number }) => void;
   onAnalysers: (nodes: { human: AnalyserNode | null; assistant: AnalyserNode | null } | null) => void;
+  /** Deterministic order router, run BEFORE the FIFO so controls never wait behind answers. Returns true when handled. */
+  command?: (text: string, source: 'text' | 'voice', id: string) => boolean;
 };
 /** Browser-only controller. Construct/start in a click handler, never during SSR. */
 export class VoiceSession {
@@ -17,6 +19,7 @@ export class VoiceSession {
   private recorder: MediaRecorder | undefined;
   private frame = 0;
   private muted = false;
+  private speechOn = true;
   private closed = false;
   private phase: VoicePhase = 'idle';
   private error: string | null = null;
@@ -78,16 +81,18 @@ export class VoiceSession {
   }
   enqueueText(text: string, voice: boolean, files?: Array<{type:'file';mediaType:string;url:string}>) {
     const id = crypto.randomUUID();
+    if (!files?.length && this.adapters.command?.(text,'text',id)) return;
     this.queue.enqueue(async () => this.runAnswer(text,id,voice,files));
     this.adapters.onTranscript(id,'user',text);
   }
   private async runAnswer(text: string, id: string, voice: boolean, files?: Array<{type:'file';mediaType:string;url:string}>) {
     if (this.closed) return;
     this.setPhase('generating');
-    const answer = await this.adapters.answer(text,this.abort.signal,id,voice,files);
+    const spoken = voice && this.speechOn;
+    const answer = await this.adapters.answer(text,this.abort.signal,id,spoken,files);
     if (this.closed) return;
-    if (voice && !answer.audioUrls.length) throw new Error('Réponse écrite reçue, mais lecture vocale indisponible.');
-    try { for (const url of answer.audioUrls) { if (this.closed) break; await this.play(url); } }
+    if (spoken && this.speechOn && !answer.audioUrls.length) throw new Error('Réponse écrite reçue, mais lecture vocale indisponible.');
+    try { for (const url of answer.audioUrls) { if (this.closed || !this.speechOn) break; await this.play(url); } }
     finally { answer.audioUrls.forEach(url => { if (url.startsWith('blob:')) URL.revokeObjectURL(url); }); }
     if (!this.closed) this.setPhase(this.stream ? 'listening' : 'idle');
   }
@@ -137,15 +142,16 @@ export class VoiceSession {
       try {
       const text = (await this.adapters.transcribe(blob, this.abort.signal)).trim();
       if (!text) throw new Error('Aucune parole reconnue.');
+      if (this.adapters.command?.(text,'voice',id)) return { ok: true as const, text, handled: true };
       if (!this.closed) this.adapters.onTranscript(id, 'user', text);
-      return { ok: true as const, text };
+      return { ok: true as const, text, handled: false };
       } finally { this.transcribing--; this.emit(); }
     }).catch(error => ({ ok: false as const, error }));
     this.sttTail = transcript.then(() => {});
     try { this.queue.enqueue(async () => {
       const result = await transcript;
       if (!result.ok) throw result.error;
-      if (this.closed) return;
+      if (this.closed || result.handled) return;
       await this.runAnswer(result.text,id,true);
     }); reserved = true; } catch(error) { this.error = error instanceof Error ? error.message : 'File pleine.'; this.emit(); }
   }
@@ -166,6 +172,14 @@ export class VoiceSession {
     void this.context?.resume();
     void this.audio.play().then(() => this.setPhase('speaking')).catch(() => this.setPhase('playback-blocked'));
   }
+  /** Speech output is independent from the microphone: silence stops playback immediately, the mic may keep listening. */
+  setSpeech(on: boolean) {
+    this.speechOn = on;
+    if (!on) { this.audio.pause(); this.finishPlayback?.(); if (this.phase === 'speaking' || this.phase === 'playback-blocked') this.setPhase(this.stream ? 'listening' : 'idle'); }
+  }
+  get speechEnabled() { return this.speechOn; }
+  /** Speak a short acknowledgement right away, outside the FIFO. */
+  async speakNow(url: string) { if (!this.speechOn || this.closed || this.phase === 'speaking') return; try { await this.prepareAudio(); this.audio.src = url; await this.audio.play(); } catch { /* text ack stays visible */ } }
   mute(value: boolean) {
     this.muted = value; this.endRecording(true);
     this.stream?.getAudioTracks().forEach(track => { track.enabled = !value; }); this.emit();
