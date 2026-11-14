@@ -1,3 +1,4 @@
+import { cleanTranscript } from "./transcript-clean";
 // Server-only: MAVAI AI calls (Lovable AI for text, ElevenLabs for voice in/out).
 import { audioExtension, speechChunks } from './voice-text';
 import { ANSWER_INSTRUCTIONS } from './answer-policy';
@@ -136,6 +137,7 @@ export async function transcribe(audioBase64: string, mime: string, signal?: Abo
   if (!key) throw new AiError(500, "Reconnaissance vocale non configurée.");
   const form = new FormData();
   form.append("model_id", "scribe_v1");
+  form.append("tag_audio_events", "false");
   const ext = audioExtension(mime);
   form.append("file", new Blob([fromBase64(audioBase64)], { type: mime }), `voice.${ext}`);
   const res = await fetch("https://api.elevenlabs.io/v1/speech-to-text", {
@@ -148,7 +150,7 @@ export async function transcribe(audioBase64: string, mime: string, signal?: Abo
     throw await voiceProviderError(res, 'Transcription');
   }
   const json = (await res.json()) as { text?: string };
-  return (json.text ?? "").trim();
+  return cleanTranscript(json.text ?? "");
 }
 
 function gatewayError(status: number): AiError {
