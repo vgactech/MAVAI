@@ -169,7 +169,7 @@ async function callOpenAI(text: string, images: ImageInput[]): Promise<string> {
 async function callElevenLabs(text: string): Promise<string | undefined> {
   let apiKey: string;
   try {
-    apiKey = readSecret("ELEVENLABS_API_KEY");
+    apiKey = (process.env["ELEVENLABS_API_KEY_ACTIVE"] || readSecret("ELEVENLABS_API_KEY"));
   } catch {
     console.warn("[DEBUG][messages] ElevenLabs key absent — skipping TTS");
     return undefined;

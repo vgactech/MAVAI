@@ -132,7 +132,8 @@ function Home() {
       {/* Hero */}
       <section className="relative border-b border-border">
         <img src={sentinelPoster.url} alt="Binance Sentinel, simulation audiovisuelle MAVAI" className="absolute inset-0 h-full w-full object-cover opacity-15" />
-        <div className="relative mx-auto max-w-6xl px-6 pb-16 pt-16 sm:pt-24">
+        <div className="relative mx-auto grid max-w-6xl gap-10 px-6 pb-16 pt-16 sm:pt-24 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+        <div className="min-w-0">
         <p className="text-sm font-medium text-accent">Mémoire Artificielle Visuelle & IA</p>
         <h1 className="mt-4 max-w-4xl text-4xl font-semibold leading-[1.05] sm:text-6xl">
           MAVAI
@@ -149,9 +150,10 @@ function Home() {
             <a href="#probleme">Voir le pitch</a>
           </Button>
         </div>
-        <figure className="mt-10 inline-flex items-center gap-4 rounded-lg border border-border bg-background p-4">
-          <QRCodeSVG value={PUBLIC_URL} size={168} marginSize={2} title="QR code vers la plateforme MAVAI DR MANATHAN" className="rounded bg-background" />
-          <figcaption className="max-w-48 text-sm">
+        </div>
+        <figure className="flex flex-col items-center gap-4 justify-self-center rounded-2xl border border-border bg-background p-6 shadow-lg lg:justify-self-end">
+          <QRCodeSVG value={PUBLIC_URL} size={384} marginSize={2} title="QR code vers la plateforme MAVAI DR MANATHAN" className="h-auto w-64 max-w-full rounded bg-background sm:w-80 lg:w-96" />
+          <figcaption className="text-center text-sm">
             <span className="block font-semibold">Scannez pour accéder à la plateforme</span>
             <a href={PUBLIC_URL} className="mt-1 block break-all text-muted-foreground underline">{PUBLIC_URL.replace("https://", "")}</a>
           </figcaption>

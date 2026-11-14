@@ -27,3 +27,12 @@ export function parseCommand(raw: string): AssistantCommand | null {
   for (const rule of RULES) if (rule.patterns.some(p => p.test(text))) return { id: rule.id, ack: rule.ack };
   return null;
 }
+
+/** Voice captured while MAVAI speaks may include its own echo before the order: accept an order only as the utterance's final words. */
+export function parseTrailingCommand(raw: string): AssistantCommand | null {
+  const direct = parseCommand(raw); if (direct) return direct;
+  if (/["«»“”]/.test(raw)) return null;
+  const words = normalize(raw).split(" ").filter(Boolean);
+  for (let n = Math.min(7, words.length - 1); n >= 1; n--) { const hit = parseCommand(words.slice(-n).join(" ")); if (hit) return hit; }
+  return null;
+}

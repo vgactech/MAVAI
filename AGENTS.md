@@ -56,3 +56,4 @@ use the editor.
 - Orders (silence, voix, micro, modes, arrête, répète, nouvelle conversation, poste BNB) go through the deterministic `src/lib/assistant-commands.ts` router before the FIFO for both text and voice; the "Oui chef" ack is shown before the effect and each transition is logged in command_events.
 - Microphone, speech output and assistant mode are three independent states; conversations.assistant_mode (audiovisual default) only prefixes the system prompt, never removes audiovisual features.
 - BNB trades are user-signed in the browser wallet (viem, PancakeSwap mainnet) after the deterministic `checkTrade` controller; the AI only analyses and never executes trades. Context sources (Hémicycle, Oriane) are labelled non-predictive.
+- Keep .env tracked (not in .gitignore): it holds only Lovable Cloud publishable values and the published build needs them.

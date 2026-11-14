@@ -61,7 +61,7 @@ export function BnbDesk() {
   }
   async function execute() {
     if (!account || !balances || !quote) return;
-    const issues = checkTrade({ side, amountBnb: side === "buy" ? Number(amount) : 0, amountUsdt: side === "sell" ? Number(amount) : 0, balanceBnb: balances.bnb, balanceUsdt: balances.usdt, priceAgeMs: Date.now() - quote.at, slippageBps: slippage });
+    const issues = checkTrade({ side, amountBnb: side === "buy" ? Number(amount) : 0, amountUsdt: side === "sell" ? Number(amount) : 0, balanceBnb: balances.bnb, balanceUsdt: balances.usdt, priceAgeMs: Date.now() - quote.at, slippageBps: slippage, spentTodayBnb: (trades.data ?? []).filter(t => t.side === "buy" && t.status !== "failed" && t.status !== "rejected" && Date.now() - new Date(t.created_at).getTime() < 86_400_000).reduce((a, t) => a + Number(t.amount_in || 0), 0) });
     if (issues.length) { issues.forEach(i => toast.error(i)); return; }
     const p = eth(); if (!p) return;
     const w = createWalletClient({ account, chain: bsc, transport: custom(p) });

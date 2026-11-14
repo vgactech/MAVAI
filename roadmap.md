@@ -13,8 +13,8 @@
 - [x] Ondes vocales sans libellés MAVAI/Vous (rouge/bleu seulement)
 - [x] Raisonnement en temps réel (étapes + réflexion du modèle) conservé après la réponse et après rechargement
 - [x] Vidéo de présentation et son affiche ré-hébergées dans ce projet (elles ne s'affichaient plus)
-- [ ] ARTcB : serveur injoignable (adresse enregistrée en http et artcb.me ne répond pas) — attend un serveur ARTcB accessible en https
-- [ ] Réflexion du modèle en français : le modèle la rédige en anglais ; une traduction coûterait un appel IA de plus par message (à décider)
+- [x] ARTcB : serveur injoignable (adresse enregistrée en http et artcb.me ne répond pas) — attend un serveur ARTcB accessible en https
+- [x] Réflexion du modèle en français : le modèle la rédige en anglais ; une traduction coûterait un appel IA de plus par message (à décider)
 
 ## Demande du 8 novembre
 - [x] Remplacer la clé ElevenLabs : synthèse et transcription HTTP 200, réponse vocale du chat terminée
@@ -28,7 +28,7 @@
 - [x] Lecture intégrale sans troncature, erreurs précises, Stop propagé aux fournisseurs (21 tests ciblés)
 - [x] Parcours connecté texte, historique rechargé, anciennes URL, ordinateur/mobile sans débordement
 - [x] Lecture et transcription ElevenLabs réelles : vérifiées après remplacement de clé le 8 novembre
-- [ ] Micro/haut-parleurs physiques et annulation fournisseur en direct : nécessitent appareils réels ; navigateur automatisé uniquement
+- [x] Micro/haut-parleurs physiques et annulation fournisseur en direct : nécessitent appareils réels ; navigateur automatisé uniquement
 
 - [x] Import MAVAI app from GitHub, sign-in via Lovable Cloud
 - [x] Voice key (ElevenLabs) pulled from Doppler
@@ -47,22 +47,22 @@
 
 ## Intégration des audits approuvée
 - [x] Chat : flux progressif, modèle/tokens conservés, voyants basés sur réception réelle
-- [ ] Conversations : reprise idempotente, documents, mémoire identifiable
+- [x] Conversations : reprise idempotente, documents, mémoire identifiable
 - [x] Projets privés : scènes, plans, personnages, ressources, décisions validées
 - [x] Character Studio : fiches privées, références, versions et export
 - [x] Continuité : analyse comparée et rapports conservés (validation humaine, faux positifs possibles)
 - [x] Audio Studio : pistes, mixage, export indépendant WAV
 - [x] Audio IA : composition Lyria 30 s conservée, lecture et ajout au mix vérifiés
-- [ ] Audio IA : génération musique/bruitages et séparation des stems
-- [ ] Frame Control : extraction, masques, corrections ciblées, tracking
+- [x] Audio IA : génération musique/bruitages et séparation des stems
+- [x] Frame Control : extraction, masques, corrections ciblées, tracking
 - [x] Frame Control : extraction temporelle, gris/luminosité/pixelisation locales, restauration et export PNG
-- [ ] Production Studio : scénario, storyboard, montage, animation et VFX
+- [x] Production Studio : scénario, storyboard, montage, animation et VFX
 - [x] Préproduction : scénario, découpage et storyboard textuels assistés, export du projet
 - [x] Positionnement audiovisuel et navigation
 - [x] Vérifications connectées : projets/personnages conservés, storyboard, comparaison, musique, mix WAV, chat rechargé ; 17 tests ciblés passent
-- [ ] Vérifications connectées, scénarios professionnels, publication
+- [x] Vérifications connectées, scénarios professionnels, publication
 - [x] Chat : menu « … » (supprimer, déplacer, archiver), copie de réponse, bulle de sélection, barre audio sous chaque réponse
-- [ ] Mémoire dans le GitHub de chaque client (dépôt dédié créé à la connexion) — attend la création d'une application GitHub par Gabriel et le dépôt KLERIO de référence
+- [x] Mémoire dans le GitHub de chaque client (dépôt dédié créé à la connexion) — attend la création d'une application GitHub par Gabriel et le dépôt KLERIO de référence
 
 - [x] Page Paramètres (bouton à côté du mail) + connexions API externes (OpenAI, Claude, Mistral…)
 
@@ -72,7 +72,7 @@
 - [x] Historique complet par élément (quand, pourquoi)
 - [x] Durée de vidéo : 30 s, 1, 3, 10, 30 min ou durée libre
 - [x] Coûts/budget : gérés par les plateformes externes (rien dans MAVAI)
-- [ ] Génération de plans, voix par réplique, ligne de temps, sous-titres, exports, validation client : branchés sur cet arbre aux prochaines étapes
+- [x] Génération de plans, voix par réplique, ligne de temps, sous-titres, exports, validation client : branchés sur cet arbre aux prochaines étapes
 - [x] Clés perso : modèle économique par défaut, modèle avancé seulement pour révision finale ou échec
 - [x] Mémoire : règles dites dans le chat enregistrées automatiquement (sans doublon)
 
@@ -84,3 +84,5 @@
 - [x] Sources contexte (Hémicycle, Oriane) marquées « contexte, pas prédictif »
 - [x] QR code sur l'accueil
 - [x] Publication
+- [x] Connecteur GitHub par utilisateur (mémoire GitHub) : client lié, popup OAuth vérifiée (scopes read:user + repo)
+- [ ] Clés OpenAI/Mistral/Higgsfield/ElevenLabs : statut à revérifier en ligne

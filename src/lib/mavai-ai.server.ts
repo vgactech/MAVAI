@@ -103,7 +103,7 @@ export async function speak(text: string, signal?: AbortSignal): Promise<string>
 }
 
 export async function synthesizeSpeech(text: string, signal?: AbortSignal): Promise<ArrayBuffer> {
-  const key = process.env["ELEVENLABS_API_KEY"];
+  const key = (process.env["ELEVENLABS_API_KEY_ACTIVE"] || process.env["ELEVENLABS_API_KEY"]);
   if (!key) throw new AiError(500, "Lecture vocale non configurée.");
   const voiceId = process.env["ELEVENLABS_VOICE_ID"] ?? "EXAVITQu4vr4xnSDxMaL";
   const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`, {
@@ -133,7 +133,7 @@ async function voiceProviderError(res: Response, service: string): Promise<AiErr
 
 /** Speech → text with ElevenLabs Scribe. */
 export async function transcribe(audioBase64: string, mime: string, signal?: AbortSignal): Promise<string> {
-  const key = process.env["ELEVENLABS_API_KEY"];
+  const key = (process.env["ELEVENLABS_API_KEY_ACTIVE"] || process.env["ELEVENLABS_API_KEY"]);
   if (!key) throw new AiError(500, "Reconnaissance vocale non configurée.");
   const form = new FormData();
   form.append("model_id", "scribe_v1");

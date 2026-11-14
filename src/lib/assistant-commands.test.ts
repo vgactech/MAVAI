@@ -8,3 +8,10 @@ describe("parseCommand", () => {
   it("does not trigger inside an ordinary sentence", () => { expect(parseCommand("explique pourquoi le mode silence est utile en réunion")).toBeNull(); });
   it("coupe le micro", () => { expect(parseCommand("coupe le micro")?.id).toBe("mic_off"); });
 });
+
+import { parseTrailingCommand } from './assistant-commands';
+import { describe as d2, it as i2, expect as e2 } from 'vitest';
+d2('orders heard while MAVAI speaks', () => {
+  i2('finds an order at the end of an echoed segment', () => { e2(parseTrailingCommand('voici la suite de la réponse arrête')?.id).toBe('stop'); });
+  i2('ignores an order word in the middle', () => { e2(parseTrailingCommand('arrête de dire que la météo est belle')).toBeNull(); });
+});

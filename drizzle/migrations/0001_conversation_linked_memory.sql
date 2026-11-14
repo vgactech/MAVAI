@@ -1,0 +1,1 @@
+ALTER TABLE public.conversations ADD COLUMN IF NOT EXISTS linked_conversation_ids uuid[] NOT NULL DEFAULT '{}';

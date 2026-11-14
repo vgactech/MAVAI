@@ -3,15 +3,47 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
 type Ticker = { lastPrice: string; priceChangePercent: string; highPrice: string; lowPrice: string; quoteVolume: string; closeTime: number };
-async function market() {
+type Market = { price: number; change24h: number; high: number; low: number; volumeUsdt: number; closes: { time: number; close: number }[]; source: string; fetchedAt: string };
+const opt = () => ({ signal: AbortSignal.timeout(8000), headers: { accept: "application/json", "user-agent": "MAVAI/1.0" } });
+async function binanceLike(base: string, label: string): Promise<Market> {
   const [t, k] = await Promise.all([
-    fetch("https://api.binance.com/api/v3/ticker/24hr?symbol=BNBUSDT", { signal: AbortSignal.timeout(8000) }),
-    fetch("https://api.binance.com/api/v3/klines?symbol=BNBUSDT&interval=1h&limit=48", { signal: AbortSignal.timeout(8000) }),
+    fetch(`${base}/api/v3/ticker/24hr?symbol=BNBUSDT`, opt()),
+    fetch(`${base}/api/v3/klines?symbol=BNBUSDT&interval=1h&limit=48`, opt()),
   ]);
-  if (!t.ok || !k.ok) throw new Error(`Données marché indisponibles [Binance ${t.status}/${k.status}]`);
+  if (!t.ok || !k.ok) throw new Error(`${label} ${t.status}/${k.status}`);
   const ticker = (await t.json()) as Ticker;
   const klines = ((await k.json()) as Array<[number, string, string, string, string]>).map(r => ({ time: r[0], close: Number(r[4]) }));
-  return { price: Number(ticker.lastPrice), change24h: Number(ticker.priceChangePercent), high: Number(ticker.highPrice), low: Number(ticker.lowPrice), volumeUsdt: Number(ticker.quoteVolume), closes: klines, source: "Binance spot BNB/USDT (api.binance.com)", fetchedAt: new Date().toISOString() };
+  return { price: Number(ticker.lastPrice), change24h: Number(ticker.priceChangePercent), high: Number(ticker.highPrice), low: Number(ticker.lowPrice), volumeUsdt: Number(ticker.quoteVolume), closes: klines, source: `${label} BNB/USDT`, fetchedAt: new Date().toISOString() };
+}
+async function okx(): Promise<Market> {
+  const [t, k] = await Promise.all([
+    fetch("https://www.okx.com/api/v5/market/ticker?instId=BNB-USDT", opt()),
+    fetch("https://www.okx.com/api/v5/market/candles?instId=BNB-USDT&bar=1H&limit=48", opt()),
+  ]);
+  if (!t.ok || !k.ok) throw new Error(`OKX ${t.status}/${k.status}`);
+  const d = ((await t.json()) as { data: Array<{ last: string; open24h: string; high24h: string; low24h: string; volCcy24h: string }> }).data[0];
+  if (!d) throw new Error("OKX vide");
+  const c = ((await k.json()) as { data: string[][] }).data.map(r => ({ time: Number(r[0]), close: Number(r[4]) })).reverse();
+  const last = Number(d.last), open = Number(d.open24h);
+  return { price: last, change24h: open ? ((last - open) / open) * 100 : 0, high: Number(d.high24h), low: Number(d.low24h), volumeUsdt: Number(d.volCcy24h), closes: c, source: "OKX spot BNB/USDT (public)", fetchedAt: new Date().toISOString() };
+}
+async function coingecko(): Promise<Market> {
+  const [t, k] = await Promise.all([
+    fetch("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=binancecoin", opt()),
+    fetch("https://api.coingecko.com/api/v3/coins/binancecoin/market_chart?vs_currency=usd&days=2", opt()),
+  ]);
+  if (!t.ok || !k.ok) throw new Error(`CoinGecko ${t.status}/${k.status}`);
+  const m = ((await t.json()) as Array<{ current_price: number; price_change_percentage_24h: number; high_24h: number; low_24h: number; total_volume: number }>)[0];
+  if (!m) throw new Error("CoinGecko vide");
+  const prices = ((await k.json()) as { prices: [number, number][] }).prices.slice(-48).map(([time, close]) => ({ time, close }));
+  return { price: m.current_price, change24h: m.price_change_percentage_24h, high: m.high_24h, low: m.low_24h, volumeUsdt: m.total_volume, closes: prices, source: "CoinGecko BNB/USD (public)", fetchedAt: new Date().toISOString() };
+}
+async function market(): Promise<Market> {
+  const errors: string[] = [];
+  for (const src of [() => binanceLike("https://data-api.binance.vision", "Binance public data"), () => binanceLike("https://api.binance.com", "Binance"), okx, coingecko]) {
+    try { return await src(); } catch (e) { errors.push(e instanceof Error ? e.message : String(e)); }
+  }
+  throw new Error(`Données marché indisponibles [${errors.join(" · ")}]`);
 }
 
 export const getBnbMarket = createServerFn({ method: "GET" }).middleware([requireSupabaseAuth]).handler(async () => market());
@@ -67,10 +99,10 @@ export const checkApis = createServerFn({ method: "GET" }).middleware([requireSu
   };
   const env = (k: string) => process.env[k];
   return Promise.all([
-    probe("Binance (prix)", "Données marché", () => fetch("https://api.binance.com/api/v3/ping", { signal: AbortSignal.timeout(6000) })),
+    probe("Binance (prix)", "Données marché", () => fetch("https://data-api.binance.vision/api/v3/ping", { signal: AbortSignal.timeout(6000) })),
     probe("BNB Chain RPC", "Soldes, confirmations", () => fetch("https://bsc-dataseed.bnbchain.org", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "eth_blockNumber", params: [] }), signal: AbortSignal.timeout(6000) })),
     probe("Lovable AI", "Chat, analyses (repli)", async () => env("LOVABLE_API_KEY") ? fetch("https://ai.gateway.lovable.dev/v1/models", { headers: { Authorization: `Bearer ${env("LOVABLE_API_KEY")}` }, signal: AbortSignal.timeout(6000) }) : "LOVABLE_API_KEY absente"),
-    probe("ElevenLabs", "Voix (TTS/STT)", async () => env("ELEVENLABS_API_KEY") ? fetch("https://api.elevenlabs.io/v1/models", { headers: { "xi-api-key": env("ELEVENLABS_API_KEY")! }, signal: AbortSignal.timeout(6000) }) : "ELEVENLABS_API_KEY absente"),
+    probe("ElevenLabs", "Voix (TTS/STT)", async () => (env("ELEVENLABS_API_KEY_ACTIVE") ?? env("ELEVENLABS_API_KEY")) ? fetch("https://api.elevenlabs.io/v1/models", { headers: { "xi-api-key": (env("ELEVENLABS_API_KEY_ACTIVE") ?? env("ELEVENLABS_API_KEY"))! }, signal: AbortSignal.timeout(6000) }) : "ELEVENLABS_API_KEY absente"),
     probe("Featherless", "Analyse marché", async () => env("FEATHERLESS_API_KEY") ? fetch("https://api.featherless.ai/v1/models?limit=1", { headers: { Authorization: `Bearer ${env("FEATHERLESS_API_KEY")}` }, signal: AbortSignal.timeout(8000) }) : "FEATHERLESS_API_KEY absente"),
     probe("Hémicycle", "Contexte parlementaire (non prédictif)", async () => env("HEMICYCLE_API_KEY") ? fetch("https://api.hemicycle.ai/mcp", { method: "POST", headers: { Authorization: `Bearer ${env("HEMICYCLE_API_KEY")}`, "Content-Type": "application/json", Accept: "application/json, text/event-stream" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "initialize", params: { protocolVersion: "2025-03-26", capabilities: {}, clientInfo: { name: "mavai", version: "1" } } }), signal: AbortSignal.timeout(8000) }) : "HEMICYCLE_API_KEY absente"),
     probe("Oriane", "Contexte social", async () => "Contrat d'API Oriane non documenté : à configurer"),

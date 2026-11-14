@@ -8,4 +8,5 @@ describe("BNB controller", () => {
   it("blocks trades above 0.5 BNB", () => { expect(checkTrade({ ...base, amountBnb: 0.6 })).toContain("Montant supérieur au plafond de 0.5 BNB."); });
   it("blocks stale price over 60s", () => { expect(checkTrade({ ...base, priceAgeMs: 61_000 }).length).toBe(1); });
   it("blocks insufficient balance", () => { expect(checkTrade({ ...base, balanceBnb: 0.1 })).toContain("Solde BNB insuffisant (frais compris)."); });
+  it("blocks buys over 2 BNB per 24h", () => { expect(checkTrade({ ...base, spentTodayBnb: 1.95 })).toContain("Plafond journalier de 2 BNB atteint."); });
 });

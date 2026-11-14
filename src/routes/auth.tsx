@@ -3,6 +3,7 @@ import { useEffect, type FormEvent } from "react";
 import { toast } from "sonner";
 import { lovable } from "@/integrations/lovable";
 import { getCurrentUser } from "@/lib/auth-session";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { MavaiMark } from "@/components/MavaiMark";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -29,9 +30,25 @@ function AuthPage() {
 
   // If already logged in, redirect straight to chat
   useEffect(() => {
-    void getCurrentUser().then((u) => {
-      if (u) navigate({ to: "/dashboard", replace: true });
+    const go = () => navigate({ to: "/dashboard", replace: true });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      if (session) go();
     });
+    // Retour OAuth plein écran : les jetons arrivent dans l'ancre de l'URL.
+    const hash = new URLSearchParams(window.location.hash.slice(1));
+    const access_token = hash.get("access_token");
+    const refresh_token = hash.get("refresh_token");
+    if (access_token && refresh_token) {
+      window.history.replaceState(null, "", window.location.pathname);
+      void supabase.auth.setSession({ access_token, refresh_token }).then(({ error }) => {
+        if (error) toast.error(error.message);
+      });
+    } else {
+      void getCurrentUser().then((u) => {
+        if (u) go();
+      });
+    }
+    return () => sub.subscription.unsubscribe();
   }, [navigate]);
 
   async function social(provider: "google" | "lovable") {

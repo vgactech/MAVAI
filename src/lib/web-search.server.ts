@@ -27,14 +27,25 @@ export async function searchWeb(query: string, signal?: AbortSignal): Promise<We
   if (!q) return { ok: false, sources: [], latencyMs: 0, error: "Requête vide" };
   const timeout = AbortSignal.timeout(6000);
   const combined = signal ? AbortSignal.any([signal, timeout]) : timeout;
-  try {
-    const res = await fetch(`https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=fr&gl=FR&ceid=FR:fr`, { signal: combined, headers: { "User-Agent": "MAVAI/1.0" } });
-    if (!res.ok) return { ok: false, sources: [], latencyMs: Date.now() - started, error: `HTTP ${res.status}` };
-    return { ok: true, sources: parseNewsRss(await res.text()), latencyMs: Date.now() - started };
-  } catch (e) {
-    if (signal?.aborted) throw e;
-    return { ok: false, sources: [], latencyMs: Date.now() - started, error: e instanceof Error ? e.message : "Réseau indisponible" };
+  // Keyless sources tried in order; cloud hosts are sometimes blocked by one provider.
+  const feeds = [
+    `https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=fr&gl=FR&ceid=FR:fr`,
+    `https://www.bing.com/news/search?q=${encodeURIComponent(q)}&format=rss&setlang=fr`,
+  ];
+  let lastError = "Réseau indisponible";
+  for (const feed of feeds) {
+    try {
+      const res = await fetch(feed, { signal: combined, headers: { "User-Agent": "Mozilla/5.0 (compatible; MAVAI/1.0)" } });
+      if (!res.ok) { lastError = `HTTP ${res.status}`; continue; }
+      const sources = parseNewsRss(await res.text());
+      if (sources.length) return { ok: true, sources, latencyMs: Date.now() - started };
+      lastError = "Aucun résultat";
+    } catch (e) {
+      if (signal?.aborted) throw e;
+      lastError = e instanceof Error ? e.message : "Réseau indisponible";
+    }
   }
+  return { ok: false, sources: [], latencyMs: Date.now() - started, error: lastError };
 }
 
 export async function checkModel(apiKey: string, modelId: string) {

@@ -8,7 +8,7 @@ import { useServerFn } from '@tanstack/react-start';
 import { supabase } from '@/integrations/supabase/client';
 import { saveStoppedAnswer } from '@/lib/chat.functions';
 import { createConversation } from '@/lib/conversation.functions';
-import { parseCommand, type AssistantCommand } from '@/lib/assistant-commands';
+import { parseCommand, parseTrailingCommand, type AssistantCommand } from '@/lib/assistant-commands';
 import { getConversationMode, setConversationMode, logCommandEvent, type AssistantMode } from '@/lib/assistant-mode.functions';
 import { speechChunks } from '@/lib/voice-text';
 import { VoiceSession, type VoicePhase } from './voice/voice-session';
@@ -120,7 +120,7 @@ export function StreamingChat({id,initialMessages,onConversation}:{id:string|nul
       },
       onTranscript:(messageId,role,text)=>setCaptions(p=>p.some(m=>m.id===messageId)?p:[...p,{id:messageId,role,parts:[{type:'text',text}]}]),
       onState:setState,onAnalysers:setNodes,
-      command:(text,source,messageId)=>{const cmd=parseCommand(text); if(!cmd) return false; void runCommand(cmd,source,messageId,text); return true;},
+      command:(text,source,messageId,duringSpeech)=>{const cmd=duringSpeech?parseTrailingCommand(text):parseCommand(text); if(!cmd) return false; void runCommand(cmd,source,messageId,text); return true;},
     });
     controller.current=session;return session;
   }

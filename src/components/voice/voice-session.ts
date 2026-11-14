@@ -8,7 +8,7 @@ export type VoiceAdapters = {
   onState: (state: { phase: VoicePhase; pending: number; muted: boolean; error: string | null; transcribing?: number }) => void;
   onAnalysers: (nodes: { human: AnalyserNode | null; assistant: AnalyserNode | null } | null) => void;
   /** Deterministic order router, run BEFORE the FIFO so controls never wait behind answers. Returns true when handled. */
-  command?: (text: string, source: 'text' | 'voice', id: string) => boolean;
+  command?: (text: string, source: 'text' | 'voice', id: string, duringSpeech?: boolean) => boolean;
 };
 /** Browser-only controller. Construct/start in a click handler, never during SSR. */
 export class VoiceSession {
@@ -97,29 +97,34 @@ export class VoiceSession {
     if (!this.closed) this.setPhase(this.stream ? 'listening' : 'idle');
   }
   private heard = false;
+  private overSpeech = false;
   private silentSince = 0;
   private recordedSince = 0;
   private capture(rms: number) {
     if (this.muted || this.phase === 'error' || !this.stream || this.closed) return;
     const now = performance.now();
     if (!this.recorder) this.beginRecording();
-    if (rms > 0.025) { this.heard = true; this.silentSince = 0; }
+    const speaking = this.phase === 'speaking';
+    if (speaking) this.overSpeech = true;
+    // While MAVAI speaks, its echo keeps the mic level up: raise the threshold and cut short segments so orders are heard mid-answer.
+    if (rms > (speaking ? 0.06 : 0.025)) { this.heard = true; this.silentSince = 0; }
     else if (this.heard) this.silentSince ||= now;
     // Listening NEVER checks generation/playback busy. Segment at silence, not at assistant onset.
-    if ((this.silentSince && now - this.silentSince >= 1200) || now - this.recordedSince >= 30000) this.endRecording(false);
+    if ((this.silentSince && now - this.silentSince >= (speaking ? 700 : 1200)) || now - this.recordedSince >= (speaking ? 5000 : 30000)) this.endRecording(false);
   }
   private beginRecording() {
     if (!this.stream) return;
     const mime = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/ogg;codecs=opus'].find(t => MediaRecorder.isTypeSupported(t));
     const recorder = mime ? new MediaRecorder(this.stream, { mimeType: mime }) : new MediaRecorder(this.stream);
     const chunks: Blob[] = []; this.recorder = recorder;
-    this.heard = false; this.silentSince = 0; this.recordedSince = performance.now();
+    this.heard = false; this.silentSince = 0; this.recordedSince = performance.now(); this.overSpeech = this.phase === 'speaking';
     let discard = false;
     recorder.ondataavailable = event => { if (event.data.size) chunks.push(event.data); };
     recorder.onstop = () => {
+      const overSpeech = this.overSpeech;
       if (this.closed || discard) return;
       const blob = new Blob(chunks, { type: recorder.mimeType });
-      if (blob.size) this.enqueue(blob);
+      if (blob.size) this.enqueue(blob, overSpeech);
     };
     recorder.addEventListener('discard', () => { discard = true; });
     recorder.start(250);
@@ -130,7 +135,7 @@ export class VoiceSession {
     if (discard || !this.heard) recorder.dispatchEvent(new Event('discard'));
     recorder.stop();
   }
-  private enqueue(blob: Blob) {
+  private enqueue(blob: Blob, overSpeech = false) {
     if (this.closed) return;
     const id = crypto.randomUUID();
     // STT is serial but independent from assistant playback. Immediate catch avoids unhandled rejections.
@@ -142,7 +147,7 @@ export class VoiceSession {
       try {
       const text = (await this.adapters.transcribe(blob, this.abort.signal)).trim();
       if (!text) throw new Error('Aucune parole reconnue.');
-      if (this.adapters.command?.(text,'voice',id)) return { ok: true as const, text, handled: true };
+      if (this.adapters.command?.(text,'voice',id,overSpeech)) return { ok: true as const, text, handled: true };
       if (!this.closed) this.adapters.onTranscript(id, 'user', text);
       return { ok: true as const, text, handled: false };
       } finally { this.transcribing--; this.emit(); }
@@ -179,7 +184,7 @@ export class VoiceSession {
   }
   get speechEnabled() { return this.speechOn; }
   /** Speak a short acknowledgement right away, outside the FIFO. */
-  async speakNow(url: string) { if (!this.speechOn || this.closed || this.phase === 'speaking') return; try { await this.prepareAudio(); this.audio.src = url; await this.audio.play(); } catch { /* text ack stays visible */ } }
+  async speakNow(url: string) { if (!this.speechOn || this.closed) return; if (this.phase === 'speaking') { const ack = new Audio(url); void ack.play().catch(() => {}); return; } try { await this.prepareAudio(); this.audio.src = url; await this.audio.play(); } catch { /* text ack stays visible */ } }
   mute(value: boolean) {
     this.muted = value; this.endRecording(true);
     this.stream?.getAudioTracks().forEach(track => { track.enabled = !value; }); this.emit();
