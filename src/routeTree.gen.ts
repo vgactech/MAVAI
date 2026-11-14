@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAgentsRouteImport } from './routes/_authenticated/agents'
 import { Route as AuthenticatedAudioStudioRouteImport } from './routes/_authenticated/audio-studio'
+import { Route as AuthenticatedBnbRouteImport } from './routes/_authenticated/bnb'
 import { Route as AuthenticatedCharacterStudioRouteImport } from './routes/_authenticated/character-studio'
 import { Route as AuthenticatedChatRouteImport } from './routes/_authenticated/chat'
 import { Route as AuthenticatedContinuityRouteImport } from './routes/_authenticated/continuity'
@@ -57,6 +58,11 @@ const AuthenticatedAudioStudioRoute =
     path: '/audio-studio',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedBnbRoute = AuthenticatedBnbRouteImport.update({
+  id: '/bnb',
+  path: '/bnb',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedCharacterStudioRoute =
   AuthenticatedCharacterStudioRouteImport.update({
     id: '/character-studio',
@@ -152,6 +158,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/agents': typeof AuthenticatedAgentsRoute
   '/audio-studio': typeof AuthenticatedAudioStudioRoute
+  '/bnb': typeof AuthenticatedBnbRoute
   '/character-studio': typeof AuthenticatedCharacterStudioRoute
   '/chat': typeof AuthenticatedChatRoute
   '/continuity': typeof AuthenticatedContinuityRoute
@@ -175,6 +182,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/agents': typeof AuthenticatedAgentsRoute
   '/audio-studio': typeof AuthenticatedAudioStudioRoute
+  '/bnb': typeof AuthenticatedBnbRoute
   '/character-studio': typeof AuthenticatedCharacterStudioRoute
   '/chat': typeof AuthenticatedChatRoute
   '/continuity': typeof AuthenticatedContinuityRoute
@@ -200,6 +208,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/agents': typeof AuthenticatedAgentsRoute
   '/_authenticated/audio-studio': typeof AuthenticatedAudioStudioRoute
+  '/_authenticated/bnb': typeof AuthenticatedBnbRoute
   '/_authenticated/character-studio': typeof AuthenticatedCharacterStudioRoute
   '/_authenticated/chat': typeof AuthenticatedChatRoute
   '/_authenticated/continuity': typeof AuthenticatedContinuityRoute
@@ -225,6 +234,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/agents'
     | '/audio-studio'
+    | '/bnb'
     | '/character-studio'
     | '/chat'
     | '/continuity'
@@ -248,6 +258,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/agents'
     | '/audio-studio'
+    | '/bnb'
     | '/character-studio'
     | '/chat'
     | '/continuity'
@@ -272,6 +283,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/agents'
     | '/_authenticated/audio-studio'
+    | '/_authenticated/bnb'
     | '/_authenticated/character-studio'
     | '/_authenticated/chat'
     | '/_authenticated/continuity'
@@ -335,6 +347,13 @@ declare module '@tanstack/react-router' {
       path: '/audio-studio'
       fullPath: '/audio-studio'
       preLoaderRoute: typeof AuthenticatedAudioStudioRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/bnb': {
+      id: '/_authenticated/bnb'
+      path: '/bnb'
+      fullPath: '/bnb'
+      preLoaderRoute: typeof AuthenticatedBnbRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/character-studio': {
@@ -462,6 +481,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAgentsRoute: typeof AuthenticatedAgentsRoute
   AuthenticatedAudioStudioRoute: typeof AuthenticatedAudioStudioRoute
+  AuthenticatedBnbRoute: typeof AuthenticatedBnbRoute
   AuthenticatedCharacterStudioRoute: typeof AuthenticatedCharacterStudioRoute
   AuthenticatedChatRoute: typeof AuthenticatedChatRoute
   AuthenticatedContinuityRoute: typeof AuthenticatedContinuityRoute
@@ -481,6 +501,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAgentsRoute: AuthenticatedAgentsRoute,
   AuthenticatedAudioStudioRoute: AuthenticatedAudioStudioRoute,
+  AuthenticatedBnbRoute: AuthenticatedBnbRoute,
   AuthenticatedCharacterStudioRoute: AuthenticatedCharacterStudioRoute,
   AuthenticatedChatRoute: AuthenticatedChatRoute,
   AuthenticatedContinuityRoute: AuthenticatedContinuityRoute,
